@@ -8,12 +8,19 @@ const agriculture = await getPage(PAGES.AGRICULTURE);
 const developpement = await getPage(PAGES.DEVELOPPEMENT);
 const urgences = await getPage(PAGES.URGENCES);
 
+// Strip WP images and figcaptions from content to avoid duplicates with our local images
+function cleanWPContent(html: string): string {
+  return html
+    .replace(/<figure[^>]*>[\s\S]*?<\/figure>/gi, '')
+    .replace(/<figcaption[^>]*>[\s\S]*?<\/figcaption>/gi, '');
+}
+
 const domaines = [
-  { data: sante, id: 'sante', image: '/images/Centresante.jpg', alt: 'Centre de sante a Zafaya' },
-  { data: education, id: 'education', image: '/images/education.jpg', alt: 'Education a Zafaya' },
-  { data: agriculture, id: 'agriculture', image: '/images/agriculture.jpg', alt: 'Agriculture a Zafaya' },
-  { data: developpement, id: 'developpement', image: '/images/Image4.jpg', alt: 'Developpement a Zafaya' },
-  { data: urgences, id: 'urgences', image: '/images/hero-africa.jpg', alt: 'Aide d urgence' },
+  { data: sante, id: 'sante', image: '/images/Centresante.jpg', alt: 'Centre de santé à Zafaya' },
+  { data: education, id: 'education', image: '/images/education.jpg', alt: 'Éducation à Zafaya' },
+  { data: agriculture, id: 'agriculture', image: '/images/agriculture.jpg', alt: 'Agriculture à Zafaya' },
+  { data: developpement, id: 'developpement', image: '/images/community.jpg', alt: 'Développement à Zafaya' },
+  { data: urgences, id: 'urgences', image: '/images/women.jpg', alt: 'Aide d\'urgence' },
 ];
 ---
 
@@ -58,7 +65,7 @@ const domaines = [
             <!-- Content -->
             <div class="w-full lg:w-3/5">
               <h2 class="text-2xl sm:text-3xl font-bold text-[#2D3436] mb-6 border-l-4 border-[#2D7A3A] pl-4" set:html={domaine.data.title.rendered} />
-              <div class="prose prose-lg max-w-none prose-headings:text-[#2D3436] prose-a:text-[#2D7A3A] prose-a:no-underline hover:prose-a:underline" set:html={domaine.data.content.rendered} />
+              <div class="prose prose-lg max-w-none prose-headings:text-[#2D3436] prose-a:text-[#2D7A3A] prose-a:no-underline hover:prose-a:underline" set:html={cleanWPContent(domaine.data.content.rendered)} />
             </div>
           </div>
         </div>
