@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
 import { getPage, PAGES } from '../lib/wordpress';
 
 const sante = await getPage(PAGES.SANTE);
@@ -8,7 +9,6 @@ const agriculture = await getPage(PAGES.AGRICULTURE);
 const developpement = await getPage(PAGES.DEVELOPPEMENT);
 const urgences = await getPage(PAGES.URGENCES);
 
-// Strip WP images and figcaptions from content to avoid duplicates with our local images
 function cleanWPContent(html: string): string {
   return html
     .replace(/<figure[^>]*>[\s\S]*?<\/figure>/gi, '')
@@ -16,56 +16,77 @@ function cleanWPContent(html: string): string {
 }
 
 const domaines = [
-  { data: sante, id: 'sante', image: '/images/health.jpg', alt: 'Santé — transfusion sanguine' },
-  { data: education, id: 'education', image: '/images/education.jpg', alt: 'Éducation à Zafaya' },
-  { data: agriculture, id: 'agriculture', image: '/images/agriculture.jpg', alt: 'Agriculture à Zafaya' },
-  { data: developpement, id: 'developpement', image: '/images/community.jpg', alt: 'Développement à Zafaya' },
-  { data: urgences, id: 'urgences', image: '/images/rawpixel-community.jpg', alt: 'Aide d\'urgence — enfant dans un camp' },
+  { data: sante, id: 'sante', image: '/images/health.jpg', alt: 'Sant\u00e9 \u2014 transfusion sanguine' },
+  { data: education, id: 'education', image: '/images/education.jpg', alt: '\u00c9ducation \u00e0 Zafaya' },
+  { data: agriculture, id: 'agriculture', image: '/images/agriculture.jpg', alt: 'Agriculture \u00e0 Zafaya' },
+  { data: developpement, id: 'developpement', image: '/images/community.jpg', alt: 'D\u00e9veloppement \u00e0 Zafaya' },
+  { data: urgences, id: 'urgences', image: '/images/rawpixel-community.jpg', alt: 'Aide d\'urgence \u2014 enfant dans un camp' },
 ];
 ---
 
-<BaseLayout title="Nos domaines d'action - ADESZ" description="Decouvrez les domaines d'action de l'ADESZ : sante, education, agriculture, developpement et urgences.">
-  <!-- Page Header -->
-  <div class="bg-[#F8F7F4] py-12 sm:py-16">
+<BaseLayout title="Nos domaines d'action - ADESZ" description="D\u00e9couvrez les domaines d'action de l'ADESZ : sant\u00e9, \u00e9ducation, agriculture, d\u00e9veloppement et urgences.">
+  <PageHero
+    title="Nos domaines d'action"
+    subtitle="L'ADESZ intervient dans cinq domaines cl\u00e9s pour am\u00e9liorer les conditions de vie \u00e0 Zafaya."
+    image="/images/hero-africa.jpg"
+    imageAlt="Afrique \u2014 domaines d'action de l'ADESZ"
+    breadcrumbs={[
+      { label: 'Accueil', href: '/' },
+      { label: "Nos domaines d'action" },
+    ]}
+  />
+
+  <!-- Quick jump nav -->
+  <div class="border-b border-[#2D3436]/5 bg-white sticky top-16 z-30 lg:top-20">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <nav class="mb-6 text-sm text-[#2D3436]/60">
-        <a href="/" class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
-        <span class="mx-2">&gt;</span>
-        <span class="text-[#2D7A3A] font-medium">Nos domaines d'action</span>
+      <nav class="flex gap-1 overflow-x-auto py-1 -mb-px" aria-label="Domaines d'action">
+        {domaines.map((d) => (
+          <a
+            href={`#${d.id}`}
+            class="whitespace-nowrap border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-[#2D3436]/50 transition-colors hover:border-[#2D7A3A] hover:text-[#2D7A3A]"
+          >
+            <span set:html={d.data.title.rendered} />
+          </a>
+        ))}
       </nav>
-      <h1 class="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-[#2D3436]">
-        Nos domaines d'action
-      </h1>
-      <p class="mt-4 text-center text-lg text-[#2D3436]/70 max-w-2xl mx-auto">
-        L'ADESZ intervient dans cinq domaines cl&eacute;s pour am&eacute;liorer les conditions de vie &agrave; Zafaya.
-      </p>
     </div>
   </div>
 
   <!-- Domain Sections -->
   {domaines.map((domaine, index) => {
     const isEven = index % 2 === 0;
-    const bgColor = isEven ? 'bg-white' : 'bg-[#F8F7F4]';
     return (
-      <section id={domaine.id} class={`${bgColor} py-12 sm:py-16 scroll-mt-20`}>
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-8 lg:gap-12 items-start`}>
+      <section id={domaine.id} class={`relative ${isEven ? 'bg-white' : 'bg-warm-gradient'} py-16 sm:py-20 scroll-mt-32`}>
+        {!isEven && <div class="absolute inset-0 pattern-diamonds"></div>}
+        <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class={`reveal flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-10 lg:gap-16 items-start`}>
             <!-- Image -->
             <div class="w-full lg:w-2/5 shrink-0">
-              <div class="relative overflow-hidden rounded-xl shadow-lg aspect-[4/3]">
+              <div class="group relative overflow-hidden rounded-2xl shadow-xl aspect-[4/3]">
                 <img
                   src={domaine.image}
                   alt={domaine.alt}
-                  class="h-full w-full object-cover"
+                  class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
                 />
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0F3D18]/30 via-transparent to-transparent"></div>
               </div>
             </div>
 
             <!-- Content -->
             <div class="w-full lg:w-3/5">
-              <h2 class="text-2xl sm:text-3xl font-bold text-[#2D3436] mb-6 border-l-4 border-[#2D7A3A] pl-4" set:html={domaine.data.title.rendered} />
-              <div class="prose prose-lg max-w-none prose-headings:text-[#2D3436] prose-a:text-[#2D7A3A] prose-a:no-underline hover:prose-a:underline" set:html={cleanWPContent(domaine.data.content.rendered)} />
+              <div class="mb-6 flex items-center gap-3">
+                <div class="h-1 w-8 rounded-full bg-gradient-to-r from-[#F5C518] to-[#2D7A3A]"></div>
+                <span class="text-xs font-bold uppercase tracking-[0.2em] text-[#2D7A3A]/60">Domaine {index + 1}/{domaines.length}</span>
+              </div>
+              <h2 class="font-display text-3xl text-[#2D3436] sm:text-4xl" set:html={domaine.data.title.rendered} />
+              <div class="mt-6 prose prose-lg max-w-none
+                prose-headings:font-display prose-headings:text-[#2D3436]
+                prose-a:text-[#2D7A3A] prose-a:no-underline hover:prose-a:underline
+                prose-img:rounded-xl prose-img:shadow-lg
+                prose-strong:text-[#2D3436]"
+                set:html={cleanWPContent(domaine.data.content.rendered)}
+              />
             </div>
           </div>
         </div>

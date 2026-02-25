@@ -11,6 +11,8 @@
   "dependencies": {
     "@astrojs/check": "^0.9.6",
     "@astrojs/sitemap": "^3.7.0",
+    "@fontsource/dm-serif-display": "^5.2.8",
+    "@fontsource/nunito-sans": "^5.2.7",
     "@fontsource/poppins": "^5.2.7",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.1",

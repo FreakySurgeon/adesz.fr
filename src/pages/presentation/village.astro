@@ -1,41 +1,69 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import DonationCTA from '../../components/DonationCTA.astro';
 import { getPage, PAGES } from '../../lib/wordpress';
 
 const page = await getPage(PAGES.VILLAGE);
+
+const siblingPages = [
+  { label: 'Le Pays', href: '/presentation/pays', active: false },
+  { label: 'Le Village', href: '/presentation/village', active: true },
+  { label: "L'Association", href: '/presentation/association', active: false },
+];
 ---
 
-<BaseLayout title={`${page.title.rendered} - ADESZ`} description="Presentation du village de Zafaya au Tchad">
-  <!-- Hero Banner -->
-  <div class="relative h-64 sm:h-80 md:h-96 overflow-hidden">
-    <img
-      src="/images/Danse_folklorique_Batha_(Tchad).jpg"
-      alt="Danse folklorique du Batha, Tchad"
-      class="h-full w-full object-cover"
-    />
-    <div class="absolute inset-0 bg-black/40"></div>
-    <div class="absolute inset-0 flex items-center justify-center">
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center px-4" set:html={page.title.rendered} />
-    </div>
-  </div>
+<BaseLayout title={`${page.title.rendered} - ADESZ`} description="Pr\u00e9sentation du village de Zafaya au Tchad">
+  <PageHero
+    title={page.title.rendered}
+    subtitle="Le village de Zafaya, au c\u0153ur de notre engagement"
+    image="/images/Danse_folklorique_Batha_(Tchad).jpg"
+    imageAlt="Danse folklorique du Batha, Tchad"
+    breadcrumbs={[
+      { label: 'Accueil', href: '/' },
+      { label: 'Pr\u00e9sentation' },
+      { label: 'Le Village' },
+    ]}
+  />
 
-  <!-- Breadcrumb -->
-  <div class="bg-[#F8F7F4]">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
-      <nav class="text-sm text-[#2D3436]/60">
-        <a href="/" class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
-        <span class="mx-2">&gt;</span>
-        <span>Pr&eacute;sentation</span>
-        <span class="mx-2">&gt;</span>
-        <span class="text-[#2D7A3A] font-medium">Le Village</span>
+  <!-- Sub-navigation -->
+  <div class="border-b border-[#2D3436]/5 bg-white sticky top-16 z-30 lg:top-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <nav class="flex gap-1 overflow-x-auto py-1 -mb-px" aria-label="Sous-navigation pr\u00e9sentation">
+        {siblingPages.map((p) => (
+          <a
+            href={p.href}
+            class={`whitespace-nowrap border-b-2 px-4 py-3 text-sm font-semibold transition-colors ${
+              p.active
+                ? 'border-[#2D7A3A] text-[#2D7A3A]'
+                : 'border-transparent text-[#2D3436]/50 hover:border-[#2D3436]/20 hover:text-[#2D3436]'
+            }`}
+          >
+            {p.label}
+          </a>
+        ))}
       </nav>
     </div>
   </div>
 
   <!-- Content -->
-  <section class="bg-white py-12 sm:py-16">
-    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-      <div class="prose prose-lg max-w-none prose-headings:text-[#2D3436] prose-a:text-[#2D7A3A] prose-a:no-underline hover:prose-a:underline" set:html={page.content.rendered} />
+  <section class="relative bg-warm-gradient py-16 sm:py-20">
+    <div class="absolute inset-0 pattern-diamonds"></div>
+    <div class="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div class="reveal rounded-2xl bg-white p-8 shadow-lg sm:p-12">
+        <div
+          class="prose prose-lg max-w-none
+            prose-headings:font-display prose-headings:text-[#2D3436]
+            prose-h2:border-l-4 prose-h2:border-[#F5C518] prose-h2:pl-4 prose-h2:mt-12 prose-h2:first:mt-0
+            prose-a:text-[#2D7A3A] prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-lg
+            prose-strong:text-[#2D3436]
+            prose-blockquote:border-[#2D7A3A] prose-blockquote:bg-[#2D7A3A]/5 prose-blockquote:rounded-r-lg prose-blockquote:py-1 prose-blockquote:pr-4"
+          set:html={page.content.rendered}
+        />
+      </div>
     </div>
   </section>
+
+  <DonationCTA />
 </BaseLayout>

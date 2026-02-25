@@ -1,50 +1,62 @@
 ---
 ---
 
-<section class="relative flex min-h-[80vh] items-center justify-center overflow-hidden">
-  <!-- Background Image -->
+<section class="relative flex min-h-[90vh] items-center justify-center overflow-hidden grain-overlay">
+  <!-- Background Image with slow zoom -->
   <img
     src="/images/hero-children.jpg"
     alt=""
-    class="absolute inset-0 h-full w-full object-cover"
+    class="absolute inset-0 h-full w-full object-cover animate-hero-scale-in"
     loading="eager"
   />
 
-  <!-- Dark Green Overlay -->
-  <div class="absolute inset-0 bg-[#1B5E27]/70"></div>
+  <!-- Layered overlays for depth -->
+  <div class="absolute inset-0 bg-gradient-to-b from-[#0F3D18]/80 via-[#1B5E27]/60 to-[#0F3D18]/90"></div>
+  <div class="absolute inset-0 bg-gradient-to-r from-[#0F3D18]/40 via-transparent to-[#0F3D18]/40"></div>
+
+  <!-- Decorative geometric shapes -->
+  <div class="absolute top-20 left-10 h-32 w-32 rounded-full border border-[#F5C518]/10 animate-float hidden lg:block"></div>
+  <div class="absolute bottom-32 right-16 h-20 w-20 rotate-45 border border-white/10 animate-float hidden lg:block" style="animation-delay: 2s;"></div>
+  <div class="absolute top-1/3 right-24 h-2 w-2 rounded-full bg-[#F5C518]/30 animate-float hidden lg:block" style="animation-delay: 1s;"></div>
 
   <!-- Content -->
-  <div class="relative z-10 mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
-    <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-      ASSOCIATION ADESZ
+  <div class="relative z-10 mx-auto max-w-5xl px-4 py-24 text-center sm:px-6 lg:px-8">
+    <!-- Decorative top element -->
+    <div class="animate-hero-fade-up hero-delay-1 mb-8 flex items-center justify-center gap-3">
+      <span class="h-px w-12 bg-[#F5C518]/60"></span>
+      <span class="text-sm font-semibold uppercase tracking-[0.3em] text-[#F5C518]">Ensemble pour Zafaya</span>
+      <span class="h-px w-12 bg-[#F5C518]/60"></span>
+    </div>
+
+    <h1 class="animate-hero-fade-up hero-delay-2 font-display text-5xl font-normal leading-tight text-white sm:text-6xl lg:text-7xl">
+      Association <em class="text-[#F5C518] not-italic">ADESZ</em>
     </h1>
 
-    <p class="mt-4 text-xl font-medium text-white/90 sm:text-2xl">
-      Pour aider le village de Zafaya
-    </p>
-
-    <p class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
+    <p class="animate-hero-fade-up hero-delay-3 mx-auto mt-6 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl">
       Nous &oelig;uvrons au Tchad pour am&eacute;liorer le quotidien des habitants de Zafaya
-      et des villages environnants. Face aux difficult&eacute;s &eacute;conomiques li&eacute;es
-      &agrave; la baisse de la p&ecirc;che et de l'agriculture, notre mission est de soutenir
-      les secteurs cl&eacute;s tels que l'&eacute;ducation, la sant&eacute; et le
-      d&eacute;veloppement agricole, afin de favoriser l'autonomie et la r&eacute;silience
-      de la communaut&eacute;.
+      &mdash; &eacute;ducation, sant&eacute; et d&eacute;veloppement agricole pour l'autonomie
+      et la r&eacute;silience de toute une communaut&eacute;.
     </p>
 
-    <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+    <div class="animate-hero-fade-up hero-delay-4 mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
       <a
         href="/adherer"
-        class="inline-flex items-center rounded-full bg-[#F5C518] px-8 py-3 text-base font-semibold text-[#2D3436] transition-colors hover:bg-[#e0b315]"
+        class="group inline-flex items-center gap-2 rounded-full bg-[#F5C518] px-8 py-3.5 text-base font-bold text-[#2D3436] shadow-lg shadow-[#F5C518]/20 transition-all duration-300 hover:bg-[#e0b315] hover:shadow-xl hover:shadow-[#F5C518]/30 hover:-translate-y-0.5"
       >
         Faire un don
+        <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
       </a>
       <a
         href="/projets"
-        class="inline-flex items-center rounded-full border-2 border-white px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-white/10"
+        class="group inline-flex items-center gap-2 rounded-full border-2 border-white/30 px-8 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:border-white/60 hover:bg-white/10 hover:-translate-y-0.5"
       >
         D&eacute;couvrir nos projets
       </a>
     </div>
   </div>
+
+  <!-- Bottom fade -->
+  <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
 </section>

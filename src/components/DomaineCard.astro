@@ -9,24 +9,33 @@ interface Props {
 const { title, description, image, link } = Astro.props;
 ---
 
-<article class="overflow-hidden rounded-xl bg-white shadow-md transition-shadow hover:shadow-lg">
-  <div class="aspect-[16/10] overflow-hidden">
+<article class="reveal group relative overflow-hidden rounded-2xl bg-white shadow-md transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
+  <!-- Image with overlay on hover -->
+  <div class="relative aspect-[16/10] overflow-hidden">
     <img
       src={image}
       alt={title}
-      class="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+      class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
       loading="lazy"
     />
+    <div class="absolute inset-0 bg-gradient-to-t from-[#0F3D18]/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
   </div>
-  <div class="p-6">
-    <h3 class="text-xl font-semibold text-[#2D3436]">{title}</h3>
-    <p class="mt-2 text-sm leading-relaxed text-[#2D3436]/70">{description}</p>
+
+  <!-- Content -->
+  <div class="relative p-7">
+    <!-- Accent bar -->
+    <div class="mb-4 h-1 w-8 rounded-full bg-gradient-to-r from-[#F5C518] to-[#2D7A3A] transition-all duration-500 group-hover:w-14"></div>
+
+    <h3 class="font-display text-xl text-[#2D3436] sm:text-2xl">{title}</h3>
+    <p class="mt-3 text-sm leading-relaxed text-[#2D3436]/60">{description}</p>
     <a
       href={link}
-      class="mt-4 inline-flex items-center text-sm font-medium text-[#2D7A3A] transition-colors hover:text-[#1B5E27]"
+      class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2D7A3A] transition-all duration-300 hover:gap-3"
     >
       En savoir plus
-      <span class="ml-1">&rarr;</span>
+      <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+      </svg>
     </a>
   </div>
 </article>

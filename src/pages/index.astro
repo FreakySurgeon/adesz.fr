@@ -42,41 +42,62 @@ const domaines = [
   <ImpactStats />
 
   <!-- Domaines d'action -->
-  <section class="bg-[#F8F7F4] py-16 sm:py-20">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <h2 class="text-center text-3xl font-bold text-[#2D3436] sm:text-4xl">
-        Nos domaines d'action
-      </h2>
-      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {domaines.map((domaine) => (
-          <DomaineCard
-            title={domaine.title}
-            description={domaine.description}
-            image={domaine.image}
-            link={domaine.link}
-          />
+  <section class="relative bg-warm-gradient py-20 sm:py-28">
+    <div class="absolute inset-0 pattern-diamonds"></div>
+    <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <!-- Section header -->
+      <div class="reveal text-center">
+        <div class="mb-4 flex items-center justify-center gap-3">
+          <span class="h-px w-8 bg-[#F5C518]"></span>
+          <span class="text-xs font-bold uppercase tracking-[0.25em] text-[#2D7A3A]">Notre mission</span>
+          <span class="h-px w-8 bg-[#F5C518]"></span>
+        </div>
+        <h2 class="font-display text-3xl text-[#2D3436] sm:text-4xl lg:text-5xl">
+          Nos domaines d'action
+        </h2>
+      </div>
+      <div class="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {domaines.map((domaine, i) => (
+          <div class={`reveal-delay-${i + 1}`}>
+            <DomaineCard
+              title={domaine.title}
+              description={domaine.description}
+              image={domaine.image}
+              link={domaine.link}
+            />
+          </div>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- Dernières actualités -->
-  <section class="bg-white py-16 sm:py-20">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <h2 class="text-center text-3xl font-bold text-[#2D3436] sm:text-4xl">
-        Derni&egrave;res actualit&eacute;s
-      </h2>
-      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {latestPosts.map((post) => {
+  <!-- Derni&egrave;res actualit&eacute;s -->
+  <section class="relative bg-white py-20 sm:py-28">
+    <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <!-- Section header -->
+      <div class="reveal text-center">
+        <div class="mb-4 flex items-center justify-center gap-3">
+          <span class="h-px w-8 bg-[#F5C518]"></span>
+          <span class="text-xs font-bold uppercase tracking-[0.25em] text-[#2D7A3A]">Actualit&eacute;s</span>
+          <span class="h-px w-8 bg-[#F5C518]"></span>
+        </div>
+        <h2 class="font-display text-3xl text-[#2D3436] sm:text-4xl lg:text-5xl">
+          Derni&egrave;res nouvelles
+        </h2>
+      </div>
+      <div class="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {latestPosts.map((post, i) => {
           const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
           return (
-            <ArticleCard
-              title={post.title.rendered}
-              date={post.date}
-              excerpt={post.excerpt.rendered}
-              slug={post.slug}
-              image={featuredImage}
-            />
+            <div class={`reveal-delay-${i + 1}`}>
+              <ArticleCard
+                title={post.title.rendered}
+                date={post.date}
+                excerpt={post.excerpt.rendered}
+                slug={post.slug}
+                image={featuredImage}
+              />
+            </div>
           );
         })}
       </div>

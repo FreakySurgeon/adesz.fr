@@ -1,0 +1,60 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  image: string;
+  imageAlt: string;
+  breadcrumbs: Array<{ label: string; href?: string }>;
+}
+
+const { title, subtitle, image, imageAlt, breadcrumbs } = Astro.props;
+---
+
+<section class="relative flex min-h-[40vh] items-end overflow-hidden grain-overlay sm:min-h-[45vh]">
+  <!-- Background Image -->
+  <img
+    src={image}
+    alt={imageAlt}
+    class="absolute inset-0 h-full w-full object-cover"
+    loading="eager"
+  />
+
+  <!-- Layered overlays -->
+  <div class="absolute inset-0 bg-gradient-to-t from-[#0F3D18]/90 via-[#1B5E27]/50 to-[#0F3D18]/30"></div>
+  <div class="absolute inset-0 bg-gradient-to-r from-[#0F3D18]/30 via-transparent to-[#0F3D18]/30"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 w-full pb-12 pt-24 sm:pb-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb -->
+      <nav class="animate-hero-fade-up hero-delay-1 mb-6 flex items-center gap-2 text-sm text-white/60">
+        {breadcrumbs.map((crumb, i) => (
+          <>
+            {i > 0 && (
+              <svg class="h-3.5 w-3.5 flex-shrink-0 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            )}
+            {crumb.href ? (
+              <a href={crumb.href} class="transition-colors hover:text-[#F5C518]">{crumb.label}</a>
+            ) : (
+              <span class="text-[#F5C518] font-medium">{crumb.label}</span>
+            )}
+          </>
+        ))}
+      </nav>
+
+      <!-- Title -->
+      <h1 class="animate-hero-fade-up hero-delay-2 font-display text-4xl text-white sm:text-5xl lg:text-6xl" set:html={title} />
+
+      {subtitle && (
+        <p class="animate-hero-fade-up hero-delay-3 mt-4 max-w-2xl text-lg text-white/70 sm:text-xl">
+          {subtitle}
+        </p>
+      )}
+    </div>
+  </div>
+
+  <!-- Bottom fade -->
+  <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+</section>
