@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getPostsByCategory, CATEGORIES } from '../../lib/wordpress';
+
+const projetsEnCours = await getPostsByCategory(CATEGORIES.PROJETS_EN_COURS);
+const projetsAVenir = await getPostsByCategory(CATEGORIES.PROJETS_A_VENIR);
+---
+
+<BaseLayout title="Nos projets - ADESZ" description="Découvrez les projets en cours et à venir de l'ADESZ pour le développement de Zafaya.">
+  <!-- Page Header -->
+  <div class="bg-[#F8F7F4] py-12 sm:py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <nav class="mb-6 text-sm text-[#2D3436]/60">
+        <a href="/" class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
+        <span class="mx-2">&gt;</span>
+        <span class="text-[#2D7A3A] font-medium">Projets</span>
+      </nav>
+      <h1 class="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-[#2D3436]">
+        Nos projets
+      </h1>
+      <p class="mt-4 text-center text-lg text-[#2D3436]/70 max-w-2xl mx-auto">
+        Les projets de l'ADESZ pour am&eacute;liorer les conditions de vie &agrave; Zafaya.
+      </p>
+    </div>
+  </div>
+
+  <!-- Projets en cours -->
+  {projetsEnCours.length > 0 && (
+    <section class="bg-white py-12 sm:py-16">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl sm:text-3xl font-bold text-[#2D3436] border-l-4 border-[#2D7A3A] pl-4">
+          Projets en cours
+        </h2>
+        <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {projetsEnCours.map((post) => {
+            const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+            return (
+              <ProjectCard
+                title={post.title.rendered}
+                date={post.date}
+                excerpt={post.excerpt.rendered}
+                slug={post.slug}
+                image={featuredImage}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Projets à venir -->
+  {projetsAVenir.length > 0 && (
+    <section class="bg-[#F8F7F4] py-12 sm:py-16">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl sm:text-3xl font-bold text-[#2D3436] border-l-4 border-[#F5C518] pl-4">
+          Projets &agrave; venir
+        </h2>
+        <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {projetsAVenir.map((post) => {
+            const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+            return (
+              <ProjectCard
+                title={post.title.rendered}
+                date={post.date}
+                excerpt={post.excerpt.rendered}
+                slug={post.slug}
+                image={featuredImage}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Empty state -->
+  {projetsEnCours.length === 0 && projetsAVenir.length === 0 && (
+    <section class="bg-white py-16 sm:py-20">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <p class="text-lg text-[#2D3436]/70">Aucun projet disponible pour le moment.</p>
+      </div>
+    </section>
+  )}
+</BaseLayout>
