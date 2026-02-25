@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPostsByCategory, CATEGORIES } from '../../lib/wordpress';
+import type { WPPost } from '../../lib/wordpress';
+
+export async function getStaticPaths() {
+  const articles = await getPostsByCategory(CATEGORIES.PRESSE);
+  return articles.map(post => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: WPPost };
+
+const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+const altText = post._embedded?.['wp:featuredmedia']?.[0]?.alt_text || post.title.rendered.replace(/<[^>]*>/g, '');
+
+const formattedDate = new Date(post.date).toLocaleDateString('fr-FR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={`${post.title.rendered.replace(/<[^>]*>/g, '')} - ADESZ`}>
+  <!-- Page Header -->
+  <div class="bg-[#F8F7F4] py-10 sm:py-14">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <nav class="mb-6 text-sm text-[#2D3436]/60">
+        <a href="/" class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
+        <span class="mx-2">&gt;</span>
+        <a href="/presse" class="hover:text-[#2D7A3A] transition-colors">Articles de presse</a>
+        <span class="mx-2">&gt;</span>
+        <span class="text-[#2D7A3A] font-medium" set:html={post.title.rendered} />
+      </nav>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2D3436]" set:html={post.title.rendered} />
+      <time datetime={post.date} class="mt-3 block text-sm text-[#2D3436]/60">
+        {formattedDate}
+      </time>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <section class="bg-white py-12 sm:py-16">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      {featuredImage && (
+        <div class="mb-10 overflow-hidden rounded-xl shadow-lg">
+          <img
+            src={featuredImage}
+            alt={altText}
+            class="h-auto w-full object-cover"
+          />
+        </div>
+      )}
+      <div class="prose prose-lg max-w-none prose-headings:text-[#2D3436] prose-a:text-[#2D7A3A] prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg" set:html={post.content.rendered} />
+
+      <!-- Back link -->
+      <div class="mt-12 border-t border-gray-200 pt-8">
+        <a
+          href="/presse"
+          class="inline-flex items-center text-sm font-medium text-[#2D7A3A] transition-colors hover:text-[#1B5E27]"
+        >
+          <span class="mr-1">&larr;</span>
+          Retour aux articles
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
