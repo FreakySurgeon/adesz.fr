@@ -6,9 +6,34 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
 }
 
-const { title, description = "ADESZ - Association pour le Developpement Economique et Social de Zafaya" } = Astro.props;
+const defaultDescription = "ADESZ - Association pour le Développement Économique et Social de Zafaya. Éducation, santé et agriculture au Tchad.";
+const { title, description = defaultDescription, ogImage = "/images/logo.png" } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
+const isHomepage = Astro.url.pathname === "/" || Astro.url.pathname === "";
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NGO",
+  "name": "ADESZ",
+  "alternateName": "Association pour le Développement Économique et Social de Zafaya",
+  "url": "https://adesz.fr",
+  "logo": "https://adesz.fr/images/logo.png",
+  "description": "Association loi 1901 pour le développement du village de Zafaya au Tchad",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "491 Bd Pierre Delmas",
+    "addressLocality": "Antibes",
+    "postalCode": "06600",
+    "addressCountry": "FR"
+  },
+  "email": "adeszafaya@gmail.com",
+  "telephone": "+33663046612"
+};
 ---
 <!DOCTYPE html>
 <html lang="fr">
@@ -16,11 +41,38 @@ const { title, description = "ADESZ - Association pour le Developpement Economiq
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#2D7A3A" />
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href={canonicalURL.href} />
+
+  <!-- Favicons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalURL.href} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={ogImageURL.href} />
+  <meta property="og:site_name" content="ADESZ" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImageURL.href} />
+
   <title>{title}</title>
+
+  <!-- JSON-LD Structured Data (homepage only) -->
+  {isHomepage && (
+    <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
+  )}
 </head>
 <body class="min-h-screen flex flex-col">
   <Header />
