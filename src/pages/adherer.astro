@@ -1,0 +1,194 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPage, PAGES } from '../lib/wordpress';
+
+const page = await getPage(PAGES.ADHERER);
+---
+
+<BaseLayout title="Adhérer / Faire un don - ADESZ" description="Soutenez l'ADESZ en faisant un don ou en devenant membre. Vos dons sont déductibles des impôts.">
+  <!-- Page Header -->
+  <div class="bg-[#F8F7F4] py-12 sm:py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <nav class="mb-6 text-sm text-[#2D3436]/60">
+        <a href="/" class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
+        <span class="mx-2">&gt;</span>
+        <span class="text-[#2D7A3A] font-medium">Adh&eacute;rer / Faire un don</span>
+      </nav>
+      <h1 class="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-[#2D3436]">
+        Adh&eacute;rer / Faire un don
+      </h1>
+      <p class="mt-4 text-center text-lg text-[#2D3436]/70 max-w-2xl mx-auto">
+        Soutenez nos actions pour le d&eacute;veloppement de Zafaya. Chaque contribution compte.
+      </p>
+    </div>
+  </div>
+
+  <!-- Three Cards -->
+  <section class="bg-white py-12 sm:py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid gap-8 md:grid-cols-3">
+        <!-- Don libre -->
+        <div class="flex flex-col items-center rounded-2xl border-2 border-[#F5C518]/30 bg-white p-8 text-center shadow-lg transition-shadow hover:shadow-xl">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#F5C518]/15">
+            <svg class="h-8 w-8 text-[#F5C518]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+          </div>
+          <h3 class="mt-6 text-xl font-bold text-[#2D3436]">Faire un don</h3>
+          <p class="mt-3 text-[#2D3436]/70 leading-relaxed">
+            Soutenez nos actions avec un don du montant de votre choix.
+          </p>
+          <a
+            href="#don"
+            class="mt-6 inline-flex items-center justify-center rounded-lg bg-[#F5C518] px-8 py-3 text-sm font-semibold text-[#2D3436] shadow-md transition-all hover:bg-[#F5C518]/90 hover:shadow-lg"
+          >
+            Faire un don
+          </a>
+        </div>
+
+        <!-- Adhésion -->
+        <div class="flex flex-col items-center rounded-2xl border-2 border-[#2D7A3A]/20 bg-white p-8 text-center shadow-lg transition-shadow hover:shadow-xl">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#2D7A3A]/10">
+            <svg class="h-8 w-8 text-[#2D7A3A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+            </svg>
+          </div>
+          <h3 class="mt-6 text-xl font-bold text-[#2D3436]">Adh&eacute;rer &agrave; l'ADESZ</h3>
+          <p class="mt-3 text-[#2D3436]/70 leading-relaxed">
+            Devenez membre de l'association. Cotisation annuelle : 15&euro;.
+          </p>
+          <a
+            href="#adhesion"
+            class="mt-6 inline-flex items-center justify-center rounded-lg bg-[#2D7A3A] px-8 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-[#1B5E27] hover:shadow-lg"
+          >
+            Adh&eacute;rer
+          </a>
+        </div>
+
+        <!-- Don + Adhésion -->
+        <div class="relative flex flex-col items-center rounded-2xl border-2 border-[#2D7A3A] bg-white p-8 text-center shadow-lg transition-shadow hover:shadow-xl">
+          <div class="absolute -top-3 right-4 rounded-full bg-[#F5C518] px-3 py-1 text-xs font-bold text-[#2D3436]">
+            Recommand&eacute;
+          </div>
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#2D7A3A]/15 to-[#F5C518]/15">
+            <svg class="h-8 w-8 text-[#2D7A3A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+            </svg>
+          </div>
+          <h3 class="mt-6 text-xl font-bold text-[#2D3436]">Don + Adh&eacute;sion</h3>
+          <p class="mt-3 text-[#2D3436]/70 leading-relaxed">
+            Adh&eacute;rez et soutenez nos projets en m&ecirc;me temps.
+          </p>
+          <a
+            href="#don-adhesion"
+            class="mt-6 inline-flex items-center justify-center rounded-lg bg-[#2D7A3A] px-8 py-3 text-sm font-semibold text-white shadow-md ring-2 ring-[#F5C518] transition-all hover:bg-[#1B5E27] hover:shadow-lg"
+          >
+            Don + Adh&eacute;sion
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HelloAsso -->
+  <section class="bg-[#F8F7F4] py-12 sm:py-16">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-2xl font-bold text-[#2D3436]">Via HelloAsso</h2>
+      <p class="mt-4 text-lg text-[#2D3436]/70">
+        Vous pouvez &eacute;galement adh&eacute;rer et faire un don via HelloAsso :
+      </p>
+      <a
+        href="https://www.helloasso.com/associations/adesz"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-6 inline-flex items-center justify-center rounded-lg bg-[#2D7A3A] px-8 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-[#1B5E27] hover:shadow-lg"
+      >
+        <svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        </svg>
+        Aller sur HelloAsso
+      </a>
+    </div>
+  </section>
+
+  <!-- Autres moyens de paiement -->
+  <section class="bg-white py-12 sm:py-16">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-[#2D3436] border-l-4 border-[#2D7A3A] pl-4 mb-8">
+        Autres moyens de paiement
+      </h2>
+      <div class="grid gap-6 sm:grid-cols-2">
+        <!-- Virement bancaire -->
+        <div class="rounded-xl border border-[#2D3436]/10 bg-[#F8F7F4] p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#2D7A3A]/10">
+              <svg class="h-5 w-5 text-[#2D7A3A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 0h.008v.008h-.008V7.5Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-[#2D3436]">Virement bancaire</h3>
+          </div>
+          <p class="text-sm text-[#2D3436]/70 mb-2">IBAN :</p>
+          <p class="font-mono text-sm font-medium text-[#2D3436] bg-white rounded-lg px-4 py-2 border border-[#2D3436]/10">
+            FR76 3000 3015 0900 0372 6041 709
+          </p>
+        </div>
+
+        <!-- Chèque -->
+        <div class="rounded-xl border border-[#2D3436]/10 bg-[#F8F7F4] p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#2D7A3A]/10">
+              <svg class="h-5 w-5 text-[#2D7A3A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-[#2D3436]">Ch&egrave;que</h3>
+          </div>
+          <p class="text-sm text-[#2D3436]/70">
+            &Agrave; l'ordre d'<strong>ADESZ</strong>
+          </p>
+          <p class="mt-2 text-sm text-[#2D3436]/70">
+            491 Bd Pierre Delmas<br />
+            06600 Antibes
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Déductibilité fiscale -->
+  <section class="bg-white pb-12 sm:pb-16">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div class="rounded-2xl bg-gradient-to-r from-[#2D7A3A] to-[#1B5E27] p-8 sm:p-10 text-white shadow-lg">
+        <div class="flex items-start gap-4">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/20">
+            <svg class="h-6 w-6 text-[#F5C518]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold">D&eacute;ductibilit&eacute; fiscale</h3>
+            <p class="mt-3 leading-relaxed text-white/90">
+              L'ADESZ est reconnue d'int&eacute;r&ecirc;t g&eacute;n&eacute;ral. Votre don est d&eacute;ductible &agrave;
+              <strong class="text-[#F5C518]">66%</strong> de votre imp&ocirc;t sur le revenu (particuliers) ou
+              <strong class="text-[#F5C518]">60%</strong> de l'imp&ocirc;t sur les soci&eacute;t&eacute;s (entreprises).
+              Un re&ccedil;u fiscal vous sera envoy&eacute;.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WP Page Content (if any additional content exists) -->
+  {page.content.rendered && page.content.rendered.trim() !== '' && (
+    <section class="bg-[#F8F7F4] py-12 sm:py-16">
+      <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <div
+          class="prose prose-lg max-w-none prose-headings:text-[#2D3436] prose-a:text-[#2D7A3A] prose-a:no-underline hover:prose-a:underline"
+          set:html={page.content.rendered}
+        />
+      </div>
+    </section>
+  )}
+</BaseLayout>
