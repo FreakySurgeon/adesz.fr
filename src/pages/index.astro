@@ -1,17 +1,9 @@
 ---
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
-
-<html lang="fr">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>ADESZ</title>
-	</head>
-	<body>
-		<h1 class="text-3xl font-bold">ADESZ</h1>
-	</body>
-</html>
+<BaseLayout title="ADESZ - Association pour le Developpement de Zafaya">
+  <section class="py-20 text-center">
+    <h1 class="text-4xl font-bold text-[#2D7A3A]">ADESZ</h1>
+    <p class="text-xl mt-4">Site en construction</p>
+  </section>
+</BaseLayout>
