@@ -11,6 +11,7 @@ export default defineConfig({
   },
 
   output: 'static',
-  site: 'https://adesz.fr',
+  site: process.env.ASTRO_SITE || 'https://adesz.fr',
+  base: process.env.ASTRO_BASE || '/',
   integrations: [sitemap()],
 });
