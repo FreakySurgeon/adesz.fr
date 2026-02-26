@@ -1,14 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/utils';
 
 const faqs = [
   {
     question: "Comment faire un don ?",
-    answer: "Vous pouvez faire un don en ligne via notre page <a href='/adherer' class='text-[#2D7A3A] underline hover:text-[#1B5E27]'>Adhérer / Faire un don</a>, par virement bancaire (IBAN FR76 3000 3015 0900 0372 6041 709), ou par chèque à l'ordre d'ADESZ."
+    answer: `Vous pouvez faire un don en ligne via notre page <a href='${url('/adherer')}' class='text-[#2D7A3A] underline hover:text-[#1B5E27]'>Adhérer / Faire un don</a>, par virement bancaire (IBAN FR76 3000 3015 0900 0372 6041 709), ou par chèque à l'ordre d'ADESZ.`
   },
   {
     question: "Comment adhérer à l'association ?",
-    answer: "L'adhésion annuelle est de 15€. Rendez-vous sur notre <a href='/adherer' class='text-[#2D7A3A] underline hover:text-[#1B5E27]'>page d'adhésion</a> pour adhérer en ligne, ou envoyez un chèque à notre adresse."
+    answer: `L'adhésion annuelle est de 15€. Rendez-vous sur notre <a href='${url('/adherer')}' class='text-[#2D7A3A] underline hover:text-[#1B5E27]'>page d'adhésion</a> pour adhérer en ligne, ou envoyez un chèque à notre adresse.`
   },
   {
     question: "Les dons sont-ils déductibles des impôts ?",
@@ -24,7 +25,7 @@ const faqs = [
   },
   {
     question: "Comment suivre l'avancement des projets ?",
-    answer: "Suivez notre actualité dans la rubrique <a href='/presse' class='text-[#2D7A3A] underline hover:text-[#1B5E27]'>Articles de presse</a> et sur nos réseaux sociaux (Facebook). Vous pouvez également <a href='/contact' class='text-[#2D7A3A] underline hover:text-[#1B5E27]'>nous contacter</a> directement."
+    answer: `Suivez notre actualité dans la rubrique <a href='${url('/presse')}' class='text-[#2D7A3A] underline hover:text-[#1B5E27]'>Articles de presse</a> et sur nos réseaux sociaux (Facebook). Vous pouvez également <a href='${url('/contact')}' class='text-[#2D7A3A] underline hover:text-[#1B5E27]'>nous contacter</a> directement.`
   },
 ];
 ---
@@ -34,7 +35,7 @@ const faqs = [
   <div class="bg-[#F8F7F4] py-12 sm:py-16">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <nav class="mb-6 text-sm text-[#2D3436]/60">
-        <a href="/" class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
+        <a href={url('/')} class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
         <span class="mx-2">&gt;</span>
         <span class="text-[#2D7A3A] font-medium">FAQ</span>
       </nav>
@@ -88,7 +89,7 @@ const faqs = [
         N'h&eacute;sitez pas &agrave; nous contacter directement, nous vous r&eacute;pondrons dans les plus brefs d&eacute;lais.
       </p>
       <a
-        href="/contact"
+        href={url('/contact')}
         class="mt-6 inline-flex items-center justify-center rounded-lg bg-[#2D7A3A] px-8 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-[#1B5E27] hover:shadow-lg"
       >
         Nous contacter

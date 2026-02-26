@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/utils';
 ---
 
 <BaseLayout title="Zafaya en vidéo - ADESZ" description="Découvrez Zafaya et les actions de l'ADESZ en vidéo.">
@@ -7,7 +8,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <div class="bg-[#F8F7F4] py-12 sm:py-16">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <nav class="mb-6 text-sm text-[#2D3436]/60">
-        <a href="/" class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
+        <a href={url('/')} class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
         <span class="mx-2">&gt;</span>
         <span class="text-[#2D7A3A] font-medium">Vid&eacute;os</span>
       </nav>
@@ -112,13 +113,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </p>
       <div class="mt-6 flex flex-wrap justify-center gap-4">
         <a
-          href="/projets"
+          href={url('/projets')}
           class="inline-flex items-center justify-center rounded-lg bg-[#2D7A3A] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-[#1B5E27] hover:shadow-lg"
         >
           Voir nos projets
         </a>
         <a
-          href="/presse"
+          href={url('/presse')}
           class="inline-flex items-center justify-center rounded-lg border-2 border-[#2D7A3A] bg-white px-6 py-3 text-sm font-semibold text-[#2D7A3A] shadow-md transition-all hover:bg-[#2D7A3A] hover:text-white hover:shadow-lg"
         >
           Articles de presse

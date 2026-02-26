@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import { url } from '../lib/utils';
 
 interface Props {
   title: string;
@@ -48,10 +49,10 @@ const organizationJsonLd = {
   <link rel="canonical" href={canonicalURL.href} />
 
   <!-- Favicons -->
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="icon" type="image/x-icon" href={url('/favicon.ico')} />
+  <link rel="apple-touch-icon" sizes="180x180" href={url('/apple-touch-icon.png')} />
+  <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32x32.png')} />
+  <link rel="icon" type="image/png" sizes="16x16" href={url('/favicon-16x16.png')} />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />

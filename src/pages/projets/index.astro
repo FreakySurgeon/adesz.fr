@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { getPostsByCategory, CATEGORIES } from '../../lib/wordpress';
+import { url } from '../../lib/utils';
 
 const projetsEnCours = await getPostsByCategory(CATEGORIES.PROJETS_EN_COURS);
 const projetsAVenir = await getPostsByCategory(CATEGORIES.PROJETS_A_VENIR);
@@ -12,7 +13,7 @@ const projetsAVenir = await getPostsByCategory(CATEGORIES.PROJETS_A_VENIR);
   <div class="bg-[#F8F7F4] py-12 sm:py-16">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <nav class="mb-6 text-sm text-[#2D3436]/60">
-        <a href="/" class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
+        <a href={url('/')} class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
         <span class="mx-2">&gt;</span>
         <span class="text-[#2D7A3A] font-medium">Projets</span>
       </nav>

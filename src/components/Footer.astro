@@ -1,11 +1,13 @@
 ---
+import { url } from '../lib/utils';
+
 const quickLinks = [
-  { label: 'Accueil', href: '/' },
-  { label: 'Nos projets', href: '/projets' },
-  { label: 'Nos r\u00e9alisations', href: '/realisations' },
-  { label: 'Articles de presse', href: '/presse' },
-  { label: 'Adh\u00e9rer', href: '/adherer' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Accueil', href: url('/') },
+  { label: 'Nos projets', href: url('/projets') },
+  { label: 'Nos r\u00e9alisations', href: url('/realisations') },
+  { label: 'Articles de presse', href: url('/presse') },
+  { label: 'Adh\u00e9rer', href: url('/adherer') },
+  { label: 'Contact', href: url('/contact') },
 ];
 
 const currentYear = new Date().getFullYear();
@@ -21,7 +23,7 @@ const currentYear = new Date().getFullYear();
       <!-- About Column -->
       <div>
         <img
-          src="/images/logo.png"
+          src={url('/images/logo.png')}
           alt="ADESZ"
           class="mb-6 h-14 w-auto brightness-0 invert"
         />

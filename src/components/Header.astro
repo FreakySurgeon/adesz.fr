@@ -1,33 +1,35 @@
 ---
+import { url } from '../lib/utils';
+
 const navItems = [
   {
     label: 'Pr\u00e9sentation',
     children: [
-      { label: 'Le Pays', href: '/presentation/pays' },
-      { label: 'Le Village', href: '/presentation/village' },
-      { label: "L'Association", href: '/presentation/association' },
+      { label: 'Le Pays', href: url('/presentation/pays') },
+      { label: 'Le Village', href: url('/presentation/village') },
+      { label: "L'Association", href: url('/presentation/association') },
     ],
   },
   {
     label: "Domaines d'action",
     children: [
-      { label: 'Sant\u00e9', href: '/domaines#sante' },
-      { label: '\u00c9ducation', href: '/domaines#education' },
-      { label: 'Agriculture', href: '/domaines#agriculture' },
-      { label: 'D\u00e9veloppement', href: '/domaines#developpement' },
-      { label: 'Urgences', href: '/domaines#urgences' },
+      { label: 'Sant\u00e9', href: url('/domaines#sante') },
+      { label: '\u00c9ducation', href: url('/domaines#education') },
+      { label: 'Agriculture', href: url('/domaines#agriculture') },
+      { label: 'D\u00e9veloppement', href: url('/domaines#developpement') },
+      { label: 'Urgences', href: url('/domaines#urgences') },
     ],
   },
   {
     label: 'Projets',
     children: [
-      { label: 'Projets en cours', href: '/projets' },
-      { label: 'Projets \u00e0 venir', href: '/projets' },
+      { label: 'Projets en cours', href: url('/projets') },
+      { label: 'Projets \u00e0 venir', href: url('/projets') },
     ],
   },
-  { label: 'R\u00e9alisations', href: '/realisations' },
-  { label: 'Partenaires', href: '/partenaires' },
-  { label: 'Presse', href: '/presse' },
+  { label: 'R\u00e9alisations', href: url('/realisations') },
+  { label: 'Partenaires', href: url('/partenaires') },
+  { label: 'Presse', href: url('/presse') },
 ];
 ---
 
@@ -35,9 +37,9 @@ const navItems = [
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div class="flex h-16 items-center justify-between lg:h-20">
       <!-- Logo -->
-      <a href="/" class="flex-shrink-0 transition-opacity hover:opacity-80">
+      <a href={url('/')} class="flex-shrink-0 transition-opacity hover:opacity-80">
         <img
-          src="/images/logo.png"
+          src={url('/images/logo.png')}
           alt="ADESZ - Retour \u00e0 l'accueil"
           class="h-10 w-auto lg:h-14"
         />
@@ -82,7 +84,7 @@ const navItems = [
       <!-- CTA + Mobile Toggle -->
       <div class="flex items-center gap-3">
         <a
-          href="/adherer"
+          href={url('/adherer')}
           class="hidden rounded-full bg-[#F5C518] px-6 py-2.5 text-sm font-bold text-[#2D3436] shadow-sm shadow-[#F5C518]/20 transition-all duration-300 hover:bg-[#e0b315] hover:shadow-md hover:shadow-[#F5C518]/30 hover:-translate-y-px sm:inline-flex sm:items-center sm:gap-1.5"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -147,7 +149,7 @@ const navItems = [
       <!-- Mobile CTA -->
       <div class="mt-8">
         <a
-          href="/adherer"
+          href={url('/adherer')}
           class="flex w-full items-center justify-center gap-2 rounded-full bg-[#F5C518] py-3.5 text-base font-bold text-[#2D3436] shadow-lg shadow-[#F5C518]/20 transition-colors hover:bg-[#e0b315]"
         >
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

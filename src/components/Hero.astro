@@ -1,10 +1,11 @@
 ---
+import { url } from '../lib/utils';
 ---
 
 <section class="relative flex min-h-[90vh] items-center justify-center overflow-hidden grain-overlay">
   <!-- Background Image with slow zoom -->
   <img
-    src="/images/hero-children.jpg"
+    src={url('/images/hero-children.jpg')}
     alt=""
     class="absolute inset-0 h-full w-full object-cover animate-hero-scale-in"
     loading="eager"
@@ -40,7 +41,7 @@
 
     <div class="animate-hero-fade-up hero-delay-4 mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
       <a
-        href="/adherer"
+        href={url('/adherer')}
         class="group inline-flex items-center gap-2 rounded-full bg-[#F5C518] px-8 py-3.5 text-base font-bold text-[#2D3436] shadow-lg shadow-[#F5C518]/20 transition-all duration-300 hover:bg-[#e0b315] hover:shadow-xl hover:shadow-[#F5C518]/30 hover:-translate-y-0.5"
       >
         Faire un don
@@ -49,7 +50,7 @@
         </svg>
       </a>
       <a
-        href="/projets"
+        href={url('/projets')}
         class="group inline-flex items-center gap-2 rounded-full border-2 border-white/30 px-8 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:border-white/60 hover:bg-white/10 hover:-translate-y-0.5"
       >
         D&eacute;couvrir nos projets
