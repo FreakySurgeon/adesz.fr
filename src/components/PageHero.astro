@@ -1,4 +1,6 @@
 ---
+import { url } from '../lib/utils';
+
 interface Props {
   title: string;
   subtitle?: string;
@@ -13,7 +15,7 @@ const { title, subtitle, image, imageAlt, breadcrumbs } = Astro.props;
 <section class="relative flex min-h-[40vh] items-end overflow-hidden grain-overlay sm:min-h-[45vh]">
   <!-- Background Image -->
   <img
-    src={image}
+    src={image.startsWith('/') ? url(image) : image}
     alt={imageAlt}
     class="absolute inset-0 h-full w-full object-cover"
     loading="eager"
@@ -36,7 +38,7 @@ const { title, subtitle, image, imageAlt, breadcrumbs } = Astro.props;
               </svg>
             )}
             {crumb.href ? (
-              <a href={crumb.href} class="transition-colors hover:text-[#F5C518]">{crumb.label}</a>
+              <a href={crumb.href?.startsWith('/') ? url(crumb.href) : crumb.href} class="transition-colors hover:text-[#F5C518]">{crumb.label}</a>
             ) : (
               <span class="text-[#F5C518] font-medium">{crumb.label}</span>
             )}

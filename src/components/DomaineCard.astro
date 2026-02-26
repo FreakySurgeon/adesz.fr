@@ -1,4 +1,6 @@
 ---
+import { url } from '../lib/utils';
+
 interface Props {
   title: string;
   description: string;
@@ -13,7 +15,7 @@ const { title, description, image, link } = Astro.props;
   <!-- Image with overlay on hover -->
   <div class="relative aspect-[16/10] overflow-hidden">
     <img
-      src={image}
+      src={image.startsWith('/') ? url(image) : image}
       alt={title}
       class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
       loading="lazy"
@@ -29,7 +31,7 @@ const { title, description, image, link } = Astro.props;
     <h3 class="font-display text-xl text-[#2D3436] sm:text-2xl">{title}</h3>
     <p class="mt-3 text-sm leading-relaxed text-[#2D3436]/60">{description}</p>
     <a
-      href={link}
+      href={link.startsWith('/') ? url(link) : link}
       class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2D7A3A] transition-all duration-300 hover:gap-3"
     >
       En savoir plus

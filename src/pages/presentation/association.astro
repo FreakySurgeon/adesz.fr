@@ -3,13 +3,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import DonationCTA from '../../components/DonationCTA.astro';
 import { getPage, PAGES } from '../../lib/wordpress';
+import { url } from '../../lib/utils';
 
 const page = await getPage(PAGES.ASSOCIATION);
 
 const siblingPages = [
-  { label: 'Le Pays', href: '/presentation/pays', active: false },
-  { label: 'Le Village', href: '/presentation/village', active: false },
-  { label: "L'Association", href: '/presentation/association', active: true },
+  { label: 'Le Pays', href: url('/presentation/pays'), active: false },
+  { label: 'Le Village', href: url('/presentation/village'), active: false },
+  { label: "L'Association", href: url('/presentation/association'), active: true },
 ];
 ---
 

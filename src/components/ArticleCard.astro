@@ -1,4 +1,6 @@
 ---
+import { url } from '../lib/utils';
+
 interface Props {
   title: string;
   date: string;
@@ -49,7 +51,7 @@ const cleanExcerpt = excerpt.replace(/<[^>]*>/g, '').slice(0, 150).trim() + '...
       {cleanExcerpt}
     </p>
     <a
-      href={`/presse/${slug}`}
+      href={url(`/presse/${slug}`)}
       class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2D7A3A] transition-all duration-300 hover:gap-3"
     >
       Lire la suite
