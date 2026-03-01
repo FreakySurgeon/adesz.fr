@@ -7,9 +7,10 @@ interface Props {
   excerpt: string;
   slug: string;
   image?: string;
+  basePath?: string;
 }
 
-const { title, date, excerpt, slug, image } = Astro.props;
+const { title, date, excerpt, slug, image, basePath = '/presse' } = Astro.props;
 
 const formattedDate = new Date(date).toLocaleDateString('fr-FR', {
   day: 'numeric',
@@ -52,7 +53,7 @@ const cleanExcerpt = decodeHtmlEntities(excerpt.replace(/<[^>]*>/g, '')).slice(0
       {cleanExcerpt}
     </p>
     <a
-      href={url(`/presse/${slug}`)}
+      href={url(`${basePath}/${slug}`)}
       class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2D7A3A] transition-all duration-300 hover:gap-3"
     >
       Lire la suite

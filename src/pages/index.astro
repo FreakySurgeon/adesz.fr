@@ -5,9 +5,15 @@ import ImpactStats from '../components/ImpactStats.astro';
 import DomaineCard from '../components/DomaineCard.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import DonationCTA from '../components/DonationCTA.astro';
-import { getPosts } from '../lib/wordpress';
+import { getPosts, CATEGORIES } from '../lib/wordpress';
 
 const latestPosts = await getPosts({ per_page: '3', orderby: 'date', order: 'desc' });
+
+function getPostBasePath(categories: number[]): string {
+  if (categories.includes(CATEGORIES.PROJETS_EN_COURS) || categories.includes(CATEGORIES.PROJETS_A_VENIR) || categories.includes(CATEGORIES.PROJETS)) return '/projets';
+  if (categories.includes(CATEGORIES.REALISATIONS)) return '/realisations';
+  return '/presse';
+}
 
 const domaines = [
   {
@@ -96,6 +102,7 @@ const domaines = [
                 excerpt={post.excerpt.rendered}
                 slug={post.slug}
                 image={featuredImage}
+                basePath={getPostBasePath(post.categories)}
               />
             </div>
           );
