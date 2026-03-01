@@ -153,8 +153,8 @@ $params = [
     'locale'               => 'fr',
     'payment_method_types' => ['card'],
     'line_items'           => $line_items,
-    'success_url'          => $site_url . '/merci',
-    'cancel_url'           => $site_url . '/adherer',
+    'success_url'          => $site_url . $base_path . '/merci',
+    'cancel_url'           => $site_url . $base_path . '/adherer',
 ];
 
 // ---------------------------------------------------------------------------

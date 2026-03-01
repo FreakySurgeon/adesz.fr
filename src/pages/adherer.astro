@@ -4,6 +4,7 @@ import { getPage, PAGES } from '../lib/wordpress';
 import { url } from '../lib/utils';
 
 const page = await getPage(PAGES.ADHERER);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <BaseLayout title="Adhérer / Faire un don - ADESZ" description="Soutenez l'ADESZ en faisant un don ou en devenant membre. Vos dons sont déductibles des impôts.">
@@ -27,7 +28,7 @@ const page = await getPage(PAGES.ADHERER);
   <!-- Interactive Payment Form -->
   <section class="bg-white py-12 sm:py-16">
     <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
-      <div class="reveal rounded-2xl border border-[#2D3436]/10 bg-white shadow-lg overflow-hidden">
+      <div id="payment-form" data-base={base} class="reveal mt-4 rounded-2xl border border-[#2D3436]/10 bg-white shadow-lg">
 
         <!-- Tab Bar -->
         <div class="flex border-b border-[#2D3436]/10" role="tablist">
@@ -177,7 +178,7 @@ const page = await getPage(PAGES.ADHERER);
                 </svg>
                 Payer par carte
               </span>
-              <span id="btn-loading" class="hidden inline-flex items-center justify-center gap-2">
+              <span id="btn-loading" style="display:none" class="inline-flex items-center justify-center gap-2">
                 <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -404,15 +405,8 @@ const page = await getPage(PAGES.ADHERER);
     function setLoading(loading: boolean) {
       isLoading = loading;
       submitBtn.disabled = loading;
-      if (loading) {
-        btnText.classList.add('hidden');
-        btnLoading.classList.remove('hidden');
-        btnLoading.classList.add('inline-flex');
-      } else {
-        btnText.classList.remove('hidden');
-        btnLoading.classList.add('hidden');
-        btnLoading.classList.remove('inline-flex');
-      }
+      btnText.style.display = loading ? 'none' : 'inline-flex';
+      btnLoading.style.display = loading ? 'inline-flex' : 'none';
     }
 
     // --- Event Listeners ---
@@ -467,7 +461,8 @@ const page = await getPage(PAGES.ADHERER);
           ? ADHESION_PRICE * 100
           : getEffectiveAmount() * 100;
 
-        const response = await fetch('/api/create-checkout.php', {
+        const basePath = document.getElementById('payment-form')?.dataset.base || '';
+        const response = await fetch(basePath + '/api/create-checkout.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
