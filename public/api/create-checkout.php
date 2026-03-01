@@ -63,6 +63,7 @@ if (!is_array($data)) {
 $amount    = $data['amount']    ?? null;
 $frequency = $data['frequency'] ?? null;
 $type      = $data['type']      ?? null;
+$member    = $data['member']    ?? null; // membership form data (optional)
 
 // Validate type
 $valid_types = ['don', 'adhesion', 'combo'];
@@ -156,6 +157,24 @@ $params = [
     'success_url'          => $site_url . $base_path . '/merci',
     'cancel_url'           => $site_url . $base_path . '/adherer',
 ];
+
+// Add membership metadata if provided
+if (is_array($member)) {
+    $allowed_fields = ['nom', 'prenom', 'birthdate', 'adresse', 'cp', 'commune', 'tel', 'email'];
+    $metadata = [];
+    foreach ($allowed_fields as $field) {
+        if (!empty($member[$field]) && is_string($member[$field])) {
+            $metadata[$field] = substr($member[$field], 0, 500); // Stripe metadata max 500 chars
+        }
+    }
+    if (!empty($metadata)) {
+        $params['metadata'] = $metadata;
+    }
+    // Pre-fill email on Stripe Checkout page
+    if (!empty($member['email']) && filter_var($member['email'], FILTER_VALIDATE_EMAIL)) {
+        $params['customer_email'] = $member['email'];
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Call Stripe API

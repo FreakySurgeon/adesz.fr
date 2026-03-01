@@ -118,6 +118,40 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             </div>
           </div>
 
+          <!-- Membership Form (visible for adhesion + combo, hidden for don) -->
+          <div id="membership-section" style="display:none" class="mt-6">
+            <label class="block text-sm font-semibold text-[#2D3436] mb-3">
+              Vos informations
+            </label>
+            <div class="space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <input type="text" id="member-nom" placeholder="Nom *" required
+                  class="rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+                <input type="text" id="member-prenom" placeholder="Pr&eacute;nom *" required
+                  class="rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+              </div>
+              <input type="date" id="member-birthdate" placeholder="Date de naissance"
+                class="w-full rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+              <input type="text" id="member-adresse" placeholder="Adresse *" required
+                class="w-full rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+              <div class="grid grid-cols-3 gap-3">
+                <input type="text" id="member-cp" placeholder="Code postal *" required
+                  class="rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+                <input type="text" id="member-commune" placeholder="Commune *" required
+                  class="col-span-2 rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <input type="tel" id="member-tel" placeholder="T&eacute;l&eacute;phone"
+                  class="rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+                <input type="email" id="member-email" placeholder="Email *" required
+                  class="rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+              </div>
+            </div>
+            <p class="mt-2 text-xs text-[#2D3436]/50">
+              * Champs obligatoires. Ces informations correspondent au bulletin d'adh&eacute;sion.
+            </p>
+          </div>
+
           <!-- Frequency Selector (visible for don + combo, hidden for adhesion) -->
           <div id="frequency-section" class="mt-6">
             <label class="block text-sm font-semibold text-[#2D3436] mb-3">
@@ -287,6 +321,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     const tabBtns = document.querySelectorAll<HTMLButtonElement>('.tab-btn');
     const amountSection = document.getElementById('amount-section')!;
     const frequencySection = document.getElementById('frequency-section')!;
+    const membershipSection = document.getElementById('membership-section')!;
     const amountBtns = document.querySelectorAll<HTMLButtonElement>('.amount-btn');
     const customInput = document.getElementById('custom-amount') as HTMLInputElement;
     const freqBtns = document.querySelectorAll<HTMLButtonElement>('.freq-btn');
@@ -313,10 +348,29 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       return selectedAmount;
     }
 
-    function isAmountValid(): boolean {
+    function getMemberData() {
+      return {
+        nom: (document.getElementById('member-nom') as HTMLInputElement).value.trim(),
+        prenom: (document.getElementById('member-prenom') as HTMLInputElement).value.trim(),
+        birthdate: (document.getElementById('member-birthdate') as HTMLInputElement).value,
+        adresse: (document.getElementById('member-adresse') as HTMLInputElement).value.trim(),
+        cp: (document.getElementById('member-cp') as HTMLInputElement).value.trim(),
+        commune: (document.getElementById('member-commune') as HTMLInputElement).value.trim(),
+        tel: (document.getElementById('member-tel') as HTMLInputElement).value.trim(),
+        email: (document.getElementById('member-email') as HTMLInputElement).value.trim(),
+      };
+    }
+
+    function isMemberFormValid(): boolean {
+      const d = getMemberData();
+      return !!(d.nom && d.prenom && d.adresse && d.cp && d.commune && d.email);
+    }
+
+    function isFormValid(): boolean {
+      const needsMember = activeTab === 'adhesion' || activeTab === 'combo';
+      if (needsMember && !isMemberFormValid()) return false;
       if (activeTab === 'adhesion') return true;
-      const amt = getEffectiveAmount();
-      return amt >= 1;
+      return getEffectiveAmount() >= 1;
     }
 
     // --- Update UI ---
@@ -337,8 +391,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     function updateVisibility() {
       const showDonFields = activeTab === 'don' || activeTab === 'combo';
+      const showMemberFields = activeTab === 'adhesion' || activeTab === 'combo';
       amountSection.style.display = showDonFields ? '' : 'none';
       frequencySection.style.display = showDonFields ? '' : 'none';
+      membershipSection.style.display = showMemberFields ? '' : 'none';
       comboNote.classList.toggle('hidden', activeTab !== 'combo');
     }
 
@@ -379,8 +435,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     }
 
     function updateSubmitButton() {
-      const valid = isAmountValid();
-      submitBtn.disabled = !valid || isLoading;
+      submitBtn.disabled = !isFormValid() || isLoading;
     }
 
     function updateAll() {
@@ -447,19 +502,26 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       });
     });
 
+    // Revalidate on membership form input
+    membershipSection.addEventListener('input', () => {
+      hideError();
+      updateSubmitButton();
+    });
+
     // Submit
     submitBtn.addEventListener('click', async () => {
-      if (!isAmountValid() || isLoading) return;
+      if (!isFormValid() || isLoading) return;
 
       hideError();
       setLoading(true);
 
       try {
-        // PHP backend handles adhesion amount (1500 cents) internally.
-        // We only send the donation amount for don/combo, or adhesion amount for adhesion.
         const amountCents = activeTab === 'adhesion'
           ? ADHESION_PRICE * 100
           : getEffectiveAmount() * 100;
+
+        const needsMember = activeTab === 'adhesion' || activeTab === 'combo';
+        const member = needsMember ? getMemberData() : null;
 
         const basePath = document.getElementById('payment-form')?.dataset.base || '';
         const response = await fetch(basePath + '/api/create-checkout.php', {
@@ -469,6 +531,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             amount: amountCents,
             frequency: activeTab === 'adhesion' ? 'one_time' : frequency,
             type: activeTab,
+            ...(member && { member }),
           }),
         });
 
