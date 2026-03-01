@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getPage, getPostsByCategory, PAGES, CATEGORIES } from '../lib/wordpress';
+import { getPage, getPostsByCategory, PAGES, CATEGORIES, decodeHtmlEntities } from '../lib/wordpress';
 import { url } from '../lib/utils';
 
 const page = await getPage(PAGES.PARTENAIRES);
@@ -45,7 +45,7 @@ const partnerPosts = await getPostsByCategory(CATEGORIES.PARTENAIRES);
         <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {partnerPosts.map((post) => {
             const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
-            const cleanExcerpt = post.excerpt.rendered.replace(/<[^>]*>/g, '').slice(0, 150).trim() + '...';
+            const cleanExcerpt = decodeHtmlEntities(post.excerpt.rendered.replace(/<[^>]*>/g, '')).slice(0, 150).trim() + '...';
             return (
               <article class="overflow-hidden rounded-xl bg-white shadow-md transition-shadow hover:shadow-lg">
                 <div class="aspect-[16/10] overflow-hidden">

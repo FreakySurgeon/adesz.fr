@@ -17,7 +17,8 @@ const formattedDate = new Date(date).toLocaleDateString('fr-FR', {
   year: 'numeric',
 });
 
-const cleanExcerpt = excerpt.replace(/<[^>]*>/g, '').slice(0, 150).trim() + '...';
+import { decodeHtmlEntities } from '../lib/wordpress';
+const cleanExcerpt = decodeHtmlEntities(excerpt.replace(/<[^>]*>/g, '')).slice(0, 150).trim() + '...';
 ---
 
 <article class="reveal group relative overflow-hidden rounded-2xl bg-white shadow-md transition-all duration-500 hover:shadow-xl hover:-translate-y-1">

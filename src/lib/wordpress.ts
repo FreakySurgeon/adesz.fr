@@ -92,3 +92,17 @@ export async function getPage(id: number): Promise<WPPage> {
 export async function getMedia(id: number): Promise<WPMedia> {
   return fetchAPI<WPMedia>(`media/${id}`);
 }
+
+const htmlEntities: Record<string, string> = {
+  '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#039;': "'", '&apos;': "'",
+  '&rsquo;': '\u2019', '&lsquo;': '\u2018', '&rdquo;': '\u201D', '&ldquo;': '\u201C',
+  '&ndash;': '\u2013', '&mdash;': '\u2014', '&hellip;': '\u2026', '&nbsp;': ' ',
+  '&eacute;': 'é', '&egrave;': 'è', '&ecirc;': 'ê', '&agrave;': 'à', '&acirc;': 'â',
+  '&ocirc;': 'ô', '&ugrave;': 'ù', '&ucirc;': 'û', '&iuml;': 'ï', '&ccedil;': 'ç',
+};
+
+export function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    .replace(/&[a-zA-Z0-9#]+;/g, (entity) => htmlEntities[entity] ?? entity);
+}
