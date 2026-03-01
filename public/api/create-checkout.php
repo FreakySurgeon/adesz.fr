@@ -149,6 +149,18 @@ if ($type === 'don') {
 // ---------------------------------------------------------------------------
 $mode = ($frequency === 'one_time') ? 'payment' : 'subscription';
 
+// Human-readable type label for invoices
+$type_labels = [
+    'don'      => 'Don',
+    'adhesion' => 'Adhésion',
+    'combo'    => 'Don + Adhésion',
+];
+$type_label = $type_labels[$type] ?? $type;
+
+$invoice_footer = 'ADESZ — Association loi 1901 d\'intérêt général — '
+    . 'Article 200 du CGI : ce don ouvre droit à une réduction d\'impôt '
+    . 'de 66% dans la limite de 20% du revenu imposable.';
+
 $params = [
     'mode'                 => $mode,
     'locale'               => 'fr',
@@ -157,6 +169,28 @@ $params = [
     'success_url'          => $site_url . $base_path . '/merci',
     'cancel_url'           => $site_url . $base_path . '/adherer',
 ];
+
+// ---------------------------------------------------------------------------
+// Invoice generation
+// ---------------------------------------------------------------------------
+if ($mode === 'payment') {
+    // For one-time payments, enable invoice creation with fiscal mentions
+    $params['invoice_creation'] = [
+        'enabled' => true,
+        'invoice_data' => [
+            'description'   => 'Reçu ' . $type_label . ' — ADESZ',
+            'footer'        => $invoice_footer,
+            'custom_fields' => [
+                ['name' => 'Type',  'value' => $type_label],
+                ['name' => 'Objet', 'value' => 'Soutien aux actions de l\'ADESZ au Tchad'],
+            ],
+        ],
+    ];
+} elseif ($mode === 'subscription') {
+    // For subscriptions, Stripe generates invoices automatically at each renewal.
+    // Add description and fiscal footer to the subscription's invoice settings.
+    $params['subscription_data']['description'] = 'Reçu ' . $type_label . ' — ADESZ';
+}
 
 // Add membership metadata if provided
 if (is_array($member)) {
