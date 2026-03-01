@@ -168,7 +168,12 @@ if (is_array($member)) {
         }
     }
     if (!empty($metadata)) {
-        $params['metadata'] = $metadata;
+        // Attach metadata to the payment/subscription object (visible in Stripe dashboard)
+        if ($mode === 'payment') {
+            $params['payment_intent_data']['metadata'] = $metadata;
+        } elseif ($mode === 'subscription') {
+            $params['subscription_data']['metadata'] = $metadata;
+        }
     }
     // Pre-fill email on Stripe Checkout page
     if (!empty($member['email']) && filter_var($member['email'], FILTER_VALIDATE_EMAIL)) {
