@@ -179,3 +179,7 @@
 .hero-delay-2 { animation-delay: 0.4s; }
 .hero-delay-3 { animation-delay: 0.6s; }
 .hero-delay-4 { animation-delay: 0.8s; }
+
+.hero-logo-glow {
+  filter: drop-shadow(0 0 40px rgba(245, 197, 24, 0.15)) drop-shadow(0 0 80px rgba(45, 122, 58, 0.1));
+}
