@@ -21,6 +21,9 @@ jobs:
         env:
           ASTRO_BASE: /test
 
+      - name: Inject Stripe secret key into config.php
+        run: sed -i "s/sk_test_REPLACE_ME/${{ secrets.STRIPE_SECRET_KEY_TEST }}/" dist/api/config.php
+
       - name: Deploy to adesz.fr/test via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

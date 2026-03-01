@@ -19,6 +19,11 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - name: Inject Stripe secret key into config.php
+        run: |
+          sed -i "s/sk_test_REPLACE_ME/${{ secrets.STRIPE_SECRET_KEY_LIVE }}/" dist/api/config.php
+          sed -i "s/\$stripe_mode = 'test'/\$stripe_mode = 'live'/" dist/api/config.php
+
       - name: Deploy to OVH via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
