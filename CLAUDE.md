@@ -47,8 +47,27 @@ Base: `https://adesz.fr/wp-json/wp/v2`
 
 Categories cles: Projets en cours (311), Realisations (314), Presse (317)
 
+## Fonctionnalites futures
+
+### Gestion des adherents & Newsletter
+- **Contact**: Abakar MAHAMAT (president ADESZ)
+- **Outil choisi**: Brevo (ex-Sendinblue) — base adherents + newsletter dans un seul outil
+- **Sync**: Stripe webhook → PHP sur OVH → Brevo API (auto-ajout nouveaux adherents)
+- **Import initial**: Excel d'Abakar → CSV → import Brevo
+- **Recus fiscaux**: PDFs Stripe (invoice_creation deja en place, mention 66%)
+- **Autonomie**: Abakar donne carte blanche, n'utilise que Brevo au quotidien
+
 ## Secrets GitHub Actions
 
 - `FTP_HOST` — Serveur FTP OVH
 - `FTP_USER` — Utilisateur FTP OVH
 - `FTP_PASSWORD` — Mot de passe FTP OVH
+- `STRIPE_SECRET_KEY_LIVE` — Clé secrète Stripe (production)
+- `STRIPE_SECRET_KEY_TEST` — Clé secrète Stripe (test)
+- `STRIPE_WEBHOOK_SECRET_LIVE` — Secret webhook Stripe (production)
+- `STRIPE_WEBHOOK_SECRET_TEST` — Secret webhook Stripe (test)
+- `BREVO_API_KEY` — Clé API Brevo
+- `BREVO_LIST_ADHERENTS` — ID liste Brevo "Adhérents"
+- `BREVO_LIST_DONATEURS` — ID liste Brevo "Donateurs"
+- `BREVO_LIST_TOUS` — ID liste Brevo "Tous"
+- `ADMIN_EMAIL` — Email de notification (échecs sync Brevo)
