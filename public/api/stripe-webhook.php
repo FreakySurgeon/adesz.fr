@@ -115,6 +115,7 @@ switch ($event_type) {
 }
 
 // Always return 200 to Stripe
+header('Content-Type: application/json');
 http_response_code(200);
 echo json_encode(['status' => 'ok']);
 exit;
@@ -127,8 +128,6 @@ exit;
  * Handle checkout.session.completed — initial payment (one-time or first subscription).
  */
 function handle_checkout_completed(array $session): void {
-    global $stripe_secret_key;
-
     $email = $session['customer_email'] ?? null;
     if (!$email) {
         error_log('Stripe webhook: checkout.session.completed without customer_email');
@@ -166,8 +165,6 @@ function handle_checkout_completed(array $session): void {
  * Handle invoice.paid — subscription renewal.
  */
 function handle_invoice_paid(array $invoice): void {
-    global $stripe_secret_key;
-
     // Only process subscription invoices (not one-time invoice_creation invoices)
     if (empty($invoice['subscription'])) {
         return;
@@ -188,15 +185,8 @@ function handle_invoice_paid(array $invoice): void {
     $type = determine_type($metadata);
     $frequency = determine_frequency('subscription', $metadata);
 
-    // On renewal, only update payment date and amount
-    $attributes = [
-        'DATE_DERNIER_PAIEMENT' => date('Y-m-d'),
-        'MONTANT'               => $amount,
-    ];
-
-    // Add member info if available (in case it changed)
-    if (!empty($metadata['nom']))    $attributes['NOM'] = $metadata['nom'];
-    if (!empty($metadata['prenom'])) $attributes['PRENOM'] = $metadata['prenom'];
+    // On renewal, update payment date, amount, and ensure type/frequency are set
+    $attributes = build_brevo_attributes($metadata, $type, $amount, $frequency, false);
 
     $list_ids = get_brevo_list_ids($type);
 
@@ -267,7 +257,7 @@ function build_brevo_attributes(array $metadata, string $type, float $amount, st
 
     foreach ($field_map as $stripe_key => $brevo_key) {
         if (!empty($metadata[$stripe_key])) {
-            $attributes[$brevo_key] = $metadata[$stripe_key];
+            $attributes[$brevo_key] = substr(trim($metadata[$stripe_key]), 0, 500);
         }
     }
 
@@ -306,7 +296,7 @@ function stripe_api_get(string $endpoint): array {
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_USERPWD        => $stripe_secret_key . ':',
-        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_TIMEOUT        => 8,
         CURLOPT_CONNECTTIMEOUT => 5,
     ]);
 
@@ -386,7 +376,7 @@ function brevo_api_post(string $endpoint, string $json_body): array {
             'api-key: ' . $brevo_api_key,
         ],
         CURLOPT_POSTFIELDS     => $json_body,
-        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_TIMEOUT        => 8,
         CURLOPT_CONNECTTIMEOUT => 5,
     ]);
 
@@ -409,6 +399,7 @@ function brevo_api_post(string $endpoint, string $json_body): array {
 
 /**
  * Save a failed contact to a local JSON file for later retry.
+ * Uses file locking to prevent race conditions on concurrent webhook calls.
  */
 function save_failed_contact(string $email, array $attributes, array $list_ids, string $error): void {
     $file = __DIR__ . '/failed_contacts.json';
@@ -421,16 +412,25 @@ function save_failed_contact(string $email, array $attributes, array $list_ids, 
         'error'      => $error,
     ];
 
-    // Read existing entries
-    $entries = [];
-    if (file_exists($file)) {
-        $content = file_get_contents($file);
-        $entries = json_decode($content, true) ?: [];
+    $fp = fopen($file, 'c+');
+    if (!$fp) {
+        error_log('Cannot open fallback file: ' . $file);
+        return;
     }
 
-    $entries[] = $entry;
+    if (flock($fp, LOCK_EX)) {
+        $content = stream_get_contents($fp);
+        $entries = $content ? (json_decode($content, true) ?: []) : [];
+        $entries[] = $entry;
 
-    file_put_contents($file, json_encode($entries, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        ftruncate($fp, 0);
+        rewind($fp);
+        fwrite($fp, json_encode($entries, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        fflush($fp);
+        flock($fp, LOCK_UN);
+    }
+
+    fclose($fp);
 }
 
 /**

@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# Brevo sync fallback (created on server at runtime)
+public/api/failed_contacts.json
+
 # macOS-specific files
 .DS_Store
 
