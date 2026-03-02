@@ -149,7 +149,7 @@ function handle_checkout_completed(array $session): void {
     }
 
     // Determine type and frequency
-    $type = determine_type($metadata, $session);
+    $type = determine_type($metadata);
     $frequency = determine_frequency($mode, $metadata);
 
     // Build Brevo contact attributes
@@ -185,7 +185,7 @@ function handle_invoice_paid(array $invoice): void {
     $sub = stripe_api_get('/v1/subscriptions/' . $invoice['subscription']);
     $metadata = $sub['metadata'] ?? [];
 
-    $type = determine_type($metadata, []);
+    $type = determine_type($metadata);
     $frequency = determine_frequency('subscription', $metadata);
 
     // On renewal, only update payment date and amount
@@ -208,39 +208,41 @@ function handle_invoice_paid(array $invoice): void {
 // ===========================================================================
 
 /**
- * Determine the contact type from metadata/session.
+ * Determine the contact type from metadata.
  */
-function determine_type(array $metadata, array $session): string {
-    // Check if line items indicate the type (adhesion products have specific names)
-    // Metadata doesn't store 'type' directly — we infer from what's present
-    if (!empty($metadata['nom']) || !empty($metadata['prenom'])) {
-        // Has member data → adhesion or combo
-        // If amount_total > adhesion price (15€), it's a combo
-        $amount = ($session['amount_total'] ?? 0) / 100;
-        if ($amount > 15) {
-            return 'combo';
-        }
-        return 'adherent';
-    }
-    return 'donateur';
+function determine_type(array $metadata): string {
+    $type = $metadata['type'] ?? '';
+
+    // Map Stripe checkout types to Brevo contact types
+    $type_map = [
+        'adhesion' => 'adherent',
+        'combo'    => 'combo',
+        'don'      => 'donateur',
+    ];
+
+    return $type_map[$type] ?? 'donateur';
 }
 
 /**
- * Determine payment frequency.
+ * Determine payment frequency from metadata.
  */
 function determine_frequency(string $mode, array $metadata): string {
-    if ($mode === 'payment') {
-        return 'one_time';
+    // Use explicit frequency from metadata (set by create-checkout.php)
+    $freq = $metadata['frequency'] ?? '';
+    if (in_array($freq, ['one_time', 'monthly', 'yearly'], true)) {
+        return $freq;
     }
-    // For subscriptions, we'd need to check the interval
-    // Default to yearly as that's the most common for the association
-    return 'yearly';
+
+    // Fallback: infer from Stripe session mode
+    return ($mode === 'payment') ? 'one_time' : 'yearly';
 }
 
 /**
  * Build Brevo contact attributes from Stripe metadata.
+ *
+ * @param bool $is_initial Whether this is the initial payment (sets DATE_ADHESION)
  */
-function build_brevo_attributes(array $metadata, string $type, float $amount, string $frequency): array {
+function build_brevo_attributes(array $metadata, string $type, float $amount, string $frequency, bool $is_initial = true): array {
     $attributes = [
         'TYPE'                  => $type,
         'MONTANT'               => $amount,
@@ -248,9 +250,10 @@ function build_brevo_attributes(array $metadata, string $type, float $amount, st
         'DATE_DERNIER_PAIEMENT' => date('Y-m-d'),
     ];
 
-    // Set DATE_ADHESION only for new contacts (Brevo upsert won't overwrite if we exclude it)
-    // We always set it — Brevo's upsert will keep the first value if we later change strategy
-    $attributes['DATE_ADHESION'] = date('Y-m-d');
+    // Only set DATE_ADHESION on initial payment, not renewals
+    if ($is_initial) {
+        $attributes['DATE_ADHESION'] = date('Y-m-d');
+    }
 
     // Map Stripe metadata fields to Brevo attributes
     $field_map = [

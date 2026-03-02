@@ -192,27 +192,31 @@ if ($mode === 'payment') {
     $params['subscription_data']['description'] = 'Reçu ' . $type_label . ' — ADESZ';
 }
 
-// Add membership metadata if provided
+// Build metadata — always include type and frequency for webhook processing
+$metadata = [
+    'type'      => $type,       // don, adhesion, combo
+    'frequency' => $frequency,  // one_time, monthly, yearly
+];
+
+// Add membership fields if provided
 if (is_array($member)) {
     $allowed_fields = ['nom', 'prenom', 'birthdate', 'adresse', 'cp', 'commune', 'tel', 'email'];
-    $metadata = [];
     foreach ($allowed_fields as $field) {
         if (!empty($member[$field]) && is_string($member[$field])) {
             $metadata[$field] = substr($member[$field], 0, 500); // Stripe metadata max 500 chars
-        }
-    }
-    if (!empty($metadata)) {
-        // Attach metadata to the payment/subscription object (visible in Stripe dashboard)
-        if ($mode === 'payment') {
-            $params['payment_intent_data']['metadata'] = $metadata;
-        } elseif ($mode === 'subscription') {
-            $params['subscription_data']['metadata'] = $metadata;
         }
     }
     // Pre-fill email on Stripe Checkout page
     if (!empty($member['email']) && filter_var($member['email'], FILTER_VALIDATE_EMAIL)) {
         $params['customer_email'] = $member['email'];
     }
+}
+
+// Attach metadata to the payment/subscription object (visible in Stripe dashboard + webhook)
+if ($mode === 'payment') {
+    $params['payment_intent_data']['metadata'] = $metadata;
+} elseif ($mode === 'subscription') {
+    $params['subscription_data']['metadata'] = $metadata;
 }
 
 // ---------------------------------------------------------------------------
