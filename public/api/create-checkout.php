@@ -176,7 +176,7 @@ $params = [
 if ($mode === 'payment') {
     // For one-time payments, enable invoice creation with fiscal mentions
     $params['invoice_creation'] = [
-        'enabled' => true,
+        'enabled' => 'true',
         'invoice_data' => [
             'description'   => 'Reçu ' . $type_label . ' — ADESZ',
             'footer'        => $invoice_footer,
