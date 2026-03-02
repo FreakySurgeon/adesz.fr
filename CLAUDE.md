@@ -10,7 +10,9 @@ Site statique de l'association ADESZ (adesz.fr) — refonte depuis WordPress/Ele
 - **CMS**: WordPress headless (REST API sur adesz.fr)
 - **Deploiement**: GitHub Actions → FTP sur OVH mutualise
 - **Formulaire**: Formspree (placeholder)
-- **Paiements**: Stripe Payment Links (placeholder) + HelloAsso
+- **Paiements**: Stripe Checkout (dons + adhésions)
+- **Sync adhérents**: Stripe webhook → Brevo API (PHP)
+- **Newsletter**: Brevo (en attente setup)
 
 ## Commands
 
@@ -28,6 +30,11 @@ Site statique de l'association ADESZ (adesz.fr) — refonte depuis WordPress/Ele
 - `src/components/` — Composants reutilisables (Hero, Cards, CTA, etc.)
 - `src/pages/` — Pages Astro (statiques et dynamiques via [slug])
 - `public/images/` — Assets statiques (logo, photos, favicon)
+- `public/api/create-checkout.php` — Création sessions Stripe Checkout (dons/adhésions/combo)
+- `public/api/stripe-webhook.php` — Webhook Stripe → Brevo (sync contacts)
+- `public/api/config.php` — Config Stripe + Brevo (placeholders remplacés par CI)
+- `public/api/.htaccess` — Protection fichiers sensibles (JSON)
+- `scripts/setup-brevo.php` — Script one-time setup Brevo (attributs + listes)
 
 ## Charte graphique
 
@@ -47,15 +54,21 @@ Base: `https://adesz.fr/wp-json/wp/v2`
 
 Categories cles: Projets en cours (311), Realisations (314), Presse (317)
 
-## Fonctionnalites futures
+## Webhook Stripe → Brevo
 
-### Gestion des adherents & Newsletter
-- **Contact**: Abakar MAHAMAT (president ADESZ)
-- **Outil choisi**: Brevo (ex-Sendinblue) — base adherents + newsletter dans un seul outil
-- **Sync**: Stripe webhook → PHP sur OVH → Brevo API (auto-ajout nouveaux adherents)
-- **Import initial**: Excel d'Abakar → CSV → import Brevo
-- **Recus fiscaux**: PDFs Stripe (invoice_creation deja en place, mention 66%)
-- **Autonomie**: Abakar donne carte blanche, n'utilise que Brevo au quotidien
+Le webhook `stripe-webhook.php` écoute `checkout.session.completed` et `invoice.paid`, puis upsert le contact dans Brevo avec les attributs : PRENOM, NOM, ADRESSE, CODE_POSTAL, COMMUNE, TELEPHONE, TYPE, DATE_ADHESION, MONTANT, FREQUENCE, DATE_DERNIER_PAIEMENT. Trois listes Brevo : Adhérents, Donateurs, Tous.
+
+En cas d'échec Brevo : 2 retries → fallback `failed_contacts.json` → email notification admin.
+
+### En attente (étapes manuelles)
+1. **Compte Brevo** — email à valider par Abakar → récupérer clé API → `.env` → `php scripts/setup-brevo.php`
+2. **Clé Stripe live** — à récupérer avec Abakar → `gh secret set STRIPE_SECRET_KEY_LIVE` → créer webhook live
+3. **Import Excel adhérents** — Abakar envoie le fichier → import CSV dans Brevo
+4. **Former Abakar** à Brevo
+
+### Docs design
+- `docs/plans/2026-03-02-stripe-brevo-webhook-design.md`
+- `docs/plans/2026-03-02-stripe-brevo-webhook.md`
 
 ## Secrets GitHub Actions
 
