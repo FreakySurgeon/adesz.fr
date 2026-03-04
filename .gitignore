@@ -20,6 +20,10 @@ pnpm-debug.log*
 # Brevo sync fallback (created on server at runtime)
 public/api/failed_contacts.json
 
+# Brevo import (données personnelles)
+brevo-import/
+*.xlsx
+
 # macOS-specific files
 .DS_Store
 
