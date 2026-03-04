@@ -74,12 +74,18 @@ function verify_stripe_signature(string $payload, string $sig_header, string $se
         }
     }
 
+    // DEBUG: Log the values for debugging (be careful in production)
+    error_log("Stripe Signature DEBUG: timestamp=$timestamp, expected=$expected");
+    foreach ($signatures as $s) {
+        error_log("Stripe Signature DEBUG: got=$s");
+    }
+
     return false;
 }
 
 if (!verify_stripe_signature($payload, $sig_header, $stripe_webhook_secret)) {
     http_response_code(400);
-    error_log('Stripe webhook: invalid signature');
+    error_log('Stripe webhook: invalid signature for secret starting with ' . substr($stripe_webhook_secret, 0, 8));
     echo 'Invalid signature';
     exit;
 }
