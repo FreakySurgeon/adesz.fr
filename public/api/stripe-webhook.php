@@ -45,9 +45,9 @@ function verify_stripe_signature(string $payload, string $sig_header, string $se
     // Parse the header: t=timestamp,v1=signature[,v1=signature...]
     $parts = [];
     foreach (explode(',', $sig_header) as $item) {
-        $kv = explode('=', $item, 2);
+        $kv = explode('=', trim($item), 2);
         if (count($kv) === 2) {
-            $parts[$kv[0]][] = $kv[1];
+            $parts[trim($kv[0])][] = trim($kv[1]);
         }
     }
 
@@ -55,27 +55,30 @@ function verify_stripe_signature(string $payload, string $sig_header, string $se
     $signatures = $parts['v1'] ?? [];
 
     if (!$timestamp || empty($signatures)) {
+        error_log("Stripe Signature DEBUG: Missing timestamp or signatures in header");
         return false;
     }
 
     // Check timestamp tolerance (anti-replay)
-    if (abs(time() - (int)$timestamp) > $tolerance) {
+    $diff = time() - (int)$timestamp;
+    if (abs($diff) > $tolerance) {
+        error_log("Stripe Signature DEBUG: Timestamp too old or too far in future (diff=$diff)");
         return false;
     }
 
     // Compute expected signature
     $signed_payload = $timestamp . '.' . $payload;
-    $expected = hash_hmac('sha256', $signed_payload, $secret);
+    $expected = hash_hmac('sha256', $signed_payload, trim($secret));
 
-    // Compare against all v1 signatures (Stripe may send multiple during key rotation)
+    // Compare against all v1 signatures
     foreach ($signatures as $sig) {
         if (hash_equals($expected, $sig)) {
             return true;
         }
     }
 
-    // DEBUG: Log the values for debugging (be careful in production)
-    error_log("Stripe Signature DEBUG: timestamp=$timestamp, expected=$expected");
+    // DEBUG: Log the values for debugging
+    error_log("Stripe Signature DEBUG: time_diff=$diff, expected=$expected");
     foreach ($signatures as $s) {
         error_log("Stripe Signature DEBUG: got=$s");
     }
