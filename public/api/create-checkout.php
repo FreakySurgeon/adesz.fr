@@ -180,6 +180,7 @@ if ($mode === 'payment') {
         'invoice_data' => [
             'description'   => 'Reçu ' . $type_label . ' — ADESZ',
             'footer'        => $invoice_footer,
+            'issuer'        => ['type' => 'self'], // Ensure we are the issuer for formal PDF
             'custom_fields' => [
                 ['name' => 'Type',  'value' => $type_label],
                 ['name' => 'Objet', 'value' => 'Soutien aux actions de l\'ADESZ au Tchad'],
