@@ -21,14 +21,14 @@ jobs:
 
       - name: Inject secrets into config.php
         run: |
-          sed -i "s/sk_test_REPLACE_ME/${{ secrets.STRIPE_SECRET_KEY_LIVE }}/" dist/api/config.php
-          sed -i "s/\$stripe_mode = 'test'/\$stripe_mode = 'live'/" dist/api/config.php
-          sed -i "s/whsec_REPLACE_ME/${{ secrets.STRIPE_WEBHOOK_SECRET_LIVE }}/" dist/api/config.php
-          sed -i "s/xkeysib-REPLACE_ME/${{ secrets.BREVO_API_KEY }}/" dist/api/config.php
-          sed -i "s/\$brevo_list_adherents = 0/\$brevo_list_adherents = ${{ secrets.BREVO_LIST_ADHERENTS }}/" dist/api/config.php
-          sed -i "s/\$brevo_list_donateurs = 0/\$brevo_list_donateurs = ${{ secrets.BREVO_LIST_DONATEURS }}/" dist/api/config.php
-          sed -i "s/\$brevo_list_tous = 0/\$brevo_list_tous = ${{ secrets.BREVO_LIST_TOUS }}/" dist/api/config.php
-          sed -i "s/admin@REPLACE_ME/${{ secrets.ADMIN_EMAIL }}/" dist/api/config.php
+          sed -i "s|sk_test_REPLACE_ME|${{ secrets.STRIPE_SECRET_KEY_LIVE }}|" dist/api/config.php
+          sed -i "s|\$stripe_mode = trim('test')|\$stripe_mode = trim('live')|" dist/api/config.php
+          sed -i "s|whsec_REPLACE_ME|${{ secrets.STRIPE_WEBHOOK_SECRET_LIVE }}|" dist/api/config.php
+          sed -i "s|xkeysib-REPLACE_ME|${{ secrets.BREVO_API_KEY }}|" dist/api/config.php
+          sed -i "s|trim('0')|trim('${{ secrets.BREVO_LIST_ADHERENTS }}')|1" dist/api/config.php
+          sed -i "s|trim('0')|trim('${{ secrets.BREVO_LIST_DONATEURS }}')|1" dist/api/config.php
+          sed -i "s|trim('0')|trim('${{ secrets.BREVO_LIST_TOUS }}')|1" dist/api/config.php
+          sed -i "s|admin@REPLACE_ME|${{ secrets.ADMIN_EMAIL }}|" dist/api/config.php
 
       - name: Deploy to OVH via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
