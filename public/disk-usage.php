@@ -31,7 +31,8 @@ function fmt(int $bytes): string {
 
 header('Content-Type: text/plain; charset=utf-8');
 
-$root = dirname(__FILE__);
+// Scan /www (parent of /test) to see WordPress files
+$root = dirname(dirname(__FILE__));
 echo "=== DISK USAGE REPORT ===\n";
 echo "Root: $root\n\n";
 
