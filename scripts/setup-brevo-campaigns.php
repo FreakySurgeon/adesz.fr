@@ -157,7 +157,7 @@ function wrap_email(string $inner, string $signed_by = 'L\'equipe ADESZ'): strin
         // Header
         . '<tr><td style="background-color:#2D7A3A;padding:24px;text-align:center;">'
         . '<img src="https://adesz.fr/images/logo-adesz.webp" alt="ADESZ" width="120" style="display:block;margin:0 auto 12px auto;max-width:120px;" />'
-        . '<p style="margin:0;font-size:14px;color:#F5C518;font-weight:600;">Association pour le Developpement Economique et Social du pays Zaghawa</p>'
+        . '<p style="margin:0;font-size:14px;color:#F5C518;font-weight:600;">Association pour le D&eacute;veloppement &Eacute;conomique et Social du pays Zaghawa</p>'
         . '</td></tr>'
 
         // Content
@@ -181,7 +181,7 @@ function wrap_email(string $inner, string $signed_by = 'L\'equipe ADESZ'): strin
         . '<p style="margin:0 0 8px 0;font-weight:600;">ADESZ</p>'
         . '<p style="margin:0 0 4px 0;">491 Bd Pierre Delmas, 06600 Antibes</p>'
         . '<p style="margin:0 0 4px 0;">Email : adeszafaya@gmail.com | Tel : 06 63 04 66 12</p>'
-        . '<p style="margin:12px 0 0 0;font-size:12px;"><a href="{{ unsubscribe }}" style="color:#636e72;text-decoration:underline;">Se desinscrire</a></p>'
+        . '<p style="margin:12px 0 0 0;font-size:12px;"><a href="{{ unsubscribe }}" style="color:#636e72;text-decoration:underline;">Se d&eacute;sinscrire</a></p>'
         . '</td></tr>'
 
         . '</table>'
@@ -272,10 +272,9 @@ $t3_inner = ''
     . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">'
     . '<tr><td style="padding:16px;background-color:#F8F7F4;border-radius:6px;">'
     . '<p style="margin:0 0 8px 0;font-size:14px;color:#636e72;">{{ params.COLLECTE }} / {{ params.OBJECTIF }}</p>'
-    . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
-    . '<td style="background-color:#dfe6e9;border-radius:4px;height:12px;padding:0;">'
-    . '<div style="background-color:#2D7A3A;border-radius:4px;height:12px;width:{{ params.POURCENTAGE }}%;max-width:100%;"></div>'
-    . '</td>'
+    . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#dfe6e9;border-radius:4px;"><tr>'
+    . '<td width="{{ params.POURCENTAGE }}%" style="background-color:#2D7A3A;border-radius:4px;height:12px;font-size:1px;line-height:1px;">&nbsp;</td>'
+    . '<td style="height:12px;font-size:1px;line-height:1px;">&nbsp;</td>'
     . '</tr></table>'
     . '<p style="margin:8px 0 0 0;font-size:14px;font-weight:600;color:#2D7A3A;text-align:right;">{{ params.POURCENTAGE }}%</p>'
     . '</td></tr></table>';
@@ -319,22 +318,22 @@ echo "\n";
 echo "--- Creating automated templates ---\n";
 
 $a1_inner = ''
-    . '<p style="margin:0 0 8px 0;font-size:22px;font-weight:700;color:#2D7A3A;">Merci pour votre fidelite !</p>'
+    . '<p style="margin:0 0 8px 0;font-size:22px;font-weight:700;color:#2D7A3A;">Merci pour votre fid&eacute;lit&eacute; !</p>'
     . '<p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#2D3436;">Cher(e) {{ contact.PRENOM }},</p>'
     . '<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#2D3436;">'
-    . 'Aujourd\'hui marque l\'anniversaire de votre adhesion a l\'ADESZ. '
-    . 'Nous tenions a vous remercier pour votre engagement a nos cotes. '
-    . 'Votre soutien est precieux et contribue directement a ameliorer la vie des communautes au Tchad.'
+    . 'Aujourd\'hui marque l\'anniversaire de votre adh&eacute;sion &agrave; l\'ADESZ. '
+    . 'Nous tenions &agrave; vous remercier pour votre engagement &agrave; nos c&ocirc;t&eacute;s. '
+    . 'Votre soutien est pr&eacute;cieux et contribue directement &agrave; am&eacute;liorer la vie des communaut&eacute;s au Tchad.'
     . '</p>'
-    . '<p style="margin:0 0 12px 0;font-size:15px;font-weight:600;color:#2D7A3A;">Grace a vous, cette annee nous avons pu :</p>'
+    . '<p style="margin:0 0 12px 0;font-size:15px;font-weight:600;color:#2D7A3A;">Gr&acirc;ce &agrave; vous, cette ann&eacute;e nous avons pu :</p>'
     . '<ul style="margin:0 0 16px 0;padding-left:20px;font-size:15px;line-height:1.8;color:#2D3436;">'
-    . '<li>Accompagner des familles dans leurs projets educatifs</li>'
-    . '<li>Soutenir des initiatives agricoles et economiques locales</li>'
-    . '<li>Renforcer l\'acces aux soins de sante dans les zones rurales</li>'
+    . '<li>Accompagner des familles dans leurs projets &eacute;ducatifs</li>'
+    . '<li>Soutenir des initiatives agricoles et &eacute;conomiques locales</li>'
+    . '<li>Renforcer l\'acc&egrave;s aux soins de sant&eacute; dans les zones rurales</li>'
     . '</ul>'
     . '<p style="margin:0 0 8px 0;font-size:15px;line-height:1.6;color:#2D3436;">'
-    . 'Si vous souhaitez aller encore plus loin, un don complementaire nous aiderait a etendre nos actions. '
-    . 'Chaque contribution, quelle que soit sa taille, fait une difference.'
+    . 'Si vous souhaitez aller encore plus loin, un don compl&eacute;mentaire nous aiderait &agrave; &eacute;tendre nos actions. '
+    . 'Chaque contribution, quelle que soit sa taille, fait une diff&eacute;rence.'
     . '</p>';
 
 $a1_id = create_template(
@@ -352,16 +351,16 @@ $a2_inner = ''
     . '<p style="margin:0 0 8px 0;font-size:22px;font-weight:700;color:#2D7A3A;">Des nouvelles de l\'ADESZ</p>'
     . '<p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#2D3436;">Cher(e) {{ contact.PRENOM }},</p>'
     . '<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#2D3436;">'
-    . 'Il y a quelques mois, vous avez fait un don a l\'ADESZ. '
-    . 'Nous voulions vous donner des nouvelles et vous montrer l\'impact concret de votre generosite.'
+    . 'Il y a quelques mois, vous avez fait un don &agrave; l\'ADESZ. '
+    . 'Nous voulions vous donner des nouvelles et vous montrer l\'impact concret de votre g&eacute;n&eacute;rosit&eacute;.'
     . '</p>'
     . '<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#2D3436;">'
-    . 'Vos contributions nous ont permis de poursuivre nos projets d\'education, de sante et de developpement agricole '
-    . 'aupres des communautes du Tchad. Chaque don compte et transforme des vies.'
+    . 'Vos contributions nous ont permis de poursuivre nos projets d\'&eacute;ducation, de sant&eacute; et de d&eacute;veloppement agricole '
+    . 'aupr&egrave;s des communaut&eacute;s du Tchad. Chaque don compte et transforme des vies.'
     . '</p>'
     . '<p style="margin:0 0 8px 0;font-size:15px;line-height:1.6;color:#2D3436;">'
-    . 'Nous serions honores de pouvoir compter a nouveau sur votre soutien. '
-    . 'Un nouveau don, meme modeste, nous aiderait a maintenir la dynamique de nos actions sur le terrain.'
+    . 'Nous serions honor&eacute;s de pouvoir compter &agrave; nouveau sur votre soutien. '
+    . 'Un nouveau don, m&ecirc;me modeste, nous aiderait &agrave; maintenir la dynamique de nos actions sur le terrain.'
     . '</p>';
 
 $a2_id = create_template(
@@ -373,23 +372,23 @@ $a2_id = create_template(
 );
 
 // ---------------------------------------------------------------------------
-// A4 — Reactivation
+// A4 — Reactivation (A3 was merged into A1 during design — numbering kept for traceability)
 // ---------------------------------------------------------------------------
 $a4_inner = ''
     . '<p style="margin:0 0 8px 0;font-size:22px;font-weight:700;color:#2D7A3A;">Vous nous manquez</p>'
     . '<p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#2D3436;">Cher(e) {{ contact.PRENOM }},</p>'
     . '<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#2D3436;">'
     . 'Cela fait un moment que nous n\'avons pas eu de vos nouvelles, et vous nous manquez. '
-    . 'L\'ADESZ continue son travail aupres des communautes au Tchad, et votre soutien a toujours ete precieux.'
+    . 'L\'ADESZ continue son travail aupr&egrave;s des communaut&eacute;s au Tchad, et votre soutien a toujours &eacute;t&eacute; pr&eacute;cieux.'
     . '</p>'
     . '<p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:#2D3436;">'
-    . 'Beaucoup de choses se sont passees depuis votre derniere visite : '
-    . 'de nouveaux projets educatifs, des avancees dans l\'acces aux soins, '
+    . 'Beaucoup de choses se sont pass&eacute;es depuis votre derni&egrave;re visite : '
+    . 'de nouveaux projets &eacute;ducatifs, des avanc&eacute;es dans l\'acc&egrave;s aux soins, '
     . 'et des initiatives agricoles prometteuses.'
     . '</p>'
     . '<p style="margin:0 0 8px 0;font-size:15px;line-height:1.6;color:#2D3436;">'
     . 'Nous serions ravis de vous retrouver parmi nos soutiens. '
-    . 'Visitez notre site pour decouvrir nos dernieres actions, ou faites un don pour nous aider a continuer.'
+    . 'Visitez notre site pour d&eacute;couvrir nos derni&egrave;res actions, ou faites un don pour nous aider &agrave; continuer.'
     . '</p>';
 
 $a4_id = create_template(
