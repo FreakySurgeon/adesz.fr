@@ -11,6 +11,13 @@
 
 require_once __DIR__ . '/config.php';
 
+// Temporary debug logging (remove after debugging)
+function debug_log(string $msg): void {
+    $file = __DIR__ . '/webhook-debug.log';
+    $line = date('c') . ' ' . $msg . "\n";
+    file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
+}
+
 // ---------------------------------------------------------------------------
 // Only POST allowed
 // ---------------------------------------------------------------------------
@@ -111,7 +118,9 @@ $event_type = $event['type'];
 // ---------------------------------------------------------------------------
 switch ($event_type) {
     case 'checkout.session.completed':
+        debug_log('Routing: checkout.session.completed');
         handle_checkout_completed($event['data']['object']);
+        debug_log('Done: checkout.session.completed');
         break;
 
     case 'invoice.paid':
@@ -140,6 +149,7 @@ function handle_checkout_completed(array $session): void {
     $email = $session['customer_email']
         ?? $session['customer_details']['email']
         ?? null;
+    debug_log('Email resolved: ' . ($email ?: 'NULL'));
     if (!$email) {
         error_log('Stripe webhook: checkout.session.completed without customer_email');
         return;
@@ -147,12 +157,15 @@ function handle_checkout_completed(array $session): void {
 
     $mode = $session['mode'] ?? 'payment'; // 'payment' or 'subscription'
     $amount_total = ($session['amount_total'] ?? 0) / 100; // cents → euros
+    debug_log("Mode=$mode, Amount=$amount_total");
 
     // Retrieve metadata from payment_intent or subscription
     $metadata = [];
     if ($mode === 'payment' && !empty($session['payment_intent'])) {
+        debug_log('Fetching PI: ' . $session['payment_intent']);
         $pi = stripe_api_get('/v1/payment_intents/' . $session['payment_intent']);
         $metadata = $pi['metadata'] ?? [];
+        debug_log('PI metadata: ' . json_encode($metadata));
     } elseif ($mode === 'subscription' && !empty($session['subscription'])) {
         $sub = stripe_api_get('/v1/subscriptions/' . $session['subscription']);
         $metadata = $sub['metadata'] ?? [];
@@ -161,18 +174,23 @@ function handle_checkout_completed(array $session): void {
     // Determine type and frequency
     $type = determine_type($metadata);
     $frequency = determine_frequency($mode, $metadata);
+    debug_log("Type=$type, Freq=$frequency");
 
     // Build Brevo contact attributes
     $attributes = build_brevo_attributes($metadata, $type, $amount_total, $frequency);
 
     // Determine which Brevo lists to add to
     $list_ids = get_brevo_list_ids($type);
+    debug_log('Brevo lists: ' . json_encode($list_ids));
 
     // Upsert contact in Brevo
     sync_to_brevo($email, $attributes, $list_ids);
+    debug_log('Brevo sync done');
 
     // Send tax receipt
+    debug_log('Sending tax receipt...');
     send_tax_receipt($email, $metadata, $amount_total, $type);
+    debug_log('Tax receipt done');
 }
 
 /**
@@ -505,11 +523,20 @@ function send_tax_receipt(string $email, array $metadata, float $amount, string 
         'type'    => $type,
     ];
 
-    $result = generate_receipt_pdf($data);
+    debug_log('Generating PDF...');
+    try {
+        $result = generate_receipt_pdf($data);
+    } catch (\Throwable $e) {
+        debug_log('PDF EXCEPTION: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+        error_log('Tax receipt: PDF exception for ' . $email . ': ' . $e->getMessage());
+        return;
+    }
     if (!$result) {
+        debug_log('PDF generation returned false');
         error_log('Tax receipt: PDF generation failed for ' . $email);
         return;
     }
+    debug_log('PDF generated: ' . $result['number']);
 
     $donor_name = trim(($data['prenom'] ?? '') . ' ' . ($data['nom'] ?? ''));
     $deduction = number_format($amount * 0.66, 2, ',', ' ');
@@ -571,8 +598,10 @@ function send_tax_receipt(string $email, array $metadata, float $amount, string 
     curl_close($ch);
 
     if ($http_code >= 200 && $http_code < 300) {
+        debug_log('Tax receipt email sent: ' . $result['number'] . ' HTTP ' . $http_code);
         error_log('Tax receipt sent: ' . $result['number'] . ' to ' . $email);
     } else {
+        debug_log('Tax receipt email FAILED: HTTP ' . $http_code . ' ' . $response);
         error_log('Tax receipt email failed (HTTP ' . $http_code . '): ' . $response);
     }
 }
