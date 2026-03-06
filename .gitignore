@@ -20,6 +20,15 @@ pnpm-debug.log*
 # Brevo sync fallback (created on server at runtime)
 public/api/failed_contacts.json
 
+# Tax receipt PDFs (generated on server at runtime)
+public/api/receipts/
+public/test-receipt.pdf
+
+# tFPDF font cache (generated at runtime)
+public/api/lib/font/unifont/*.mtx.php
+public/api/lib/font/unifont/*.cw.dat
+public/api/lib/font/unifont/*.cw127.php
+
 # Brevo import (données personnelles)
 brevo-import/
 *.xlsx

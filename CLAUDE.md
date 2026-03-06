@@ -84,3 +84,4 @@ En cas d'échec Brevo : 2 retries → fallback `failed_contacts.json` → email 
 - `BREVO_LIST_DONATEURS` — ID liste Brevo "Donateurs"
 - `BREVO_LIST_TOUS` — ID liste Brevo "Tous"
 - `ADMIN_EMAIL` — Email de notification (échecs sync Brevo)
+- `BREVO_LIST_NEWSLETTER` — ID liste Brevo "Newsletter ADESZ"

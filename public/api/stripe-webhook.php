@@ -168,6 +168,9 @@ function handle_checkout_completed(array $session): void {
 
     // Upsert contact in Brevo
     sync_to_brevo($email, $attributes, $list_ids);
+
+    // Send tax receipt
+    send_tax_receipt($email, $metadata, $amount_total, $type);
 }
 
 /**
@@ -200,6 +203,9 @@ function handle_invoice_paid(array $invoice): void {
     $list_ids = get_brevo_list_ids($type);
 
     sync_to_brevo($email, $attributes, $list_ids);
+
+    // Send tax receipt for renewal
+    send_tax_receipt($email, $metadata, $amount, $type);
 }
 
 // ===========================================================================
@@ -465,4 +471,104 @@ function notify_admin_failure(string $contact_email, string $error): void {
         . 'Content-Type: text/plain; charset=UTF-8';
 
     @mail($admin_email, $subject, $message, $headers);
+}
+
+// ===========================================================================
+// Tax receipt
+// ===========================================================================
+
+/**
+ * Generate and send a tax receipt via Brevo transactional email.
+ */
+function send_tax_receipt(string $email, array $metadata, float $amount, string $type): void {
+    global $brevo_api_key;
+
+    if ($amount <= 0) {
+        return;
+    }
+
+    require_once __DIR__ . '/generate-receipt.php';
+
+    $data = [
+        'email'   => $email,
+        'prenom'  => $metadata['prenom'] ?? '',
+        'nom'     => $metadata['nom'] ?? '',
+        'adresse' => $metadata['adresse'] ?? '',
+        'cp'      => $metadata['cp'] ?? '',
+        'commune' => $metadata['commune'] ?? '',
+        'amount'  => $amount,
+        'date'    => date('d/m/Y'),
+        'type'    => $type,
+    ];
+
+    $result = generate_receipt_pdf($data);
+    if (!$result) {
+        error_log('Tax receipt: PDF generation failed for ' . $email);
+        return;
+    }
+
+    $donor_name = trim(($data['prenom'] ?? '') . ' ' . ($data['nom'] ?? ''));
+    $deduction = number_format($amount * 0.66, 2, ',', ' ');
+    $amount_fmt = number_format($amount, 2, ',', ' ');
+
+    $email_body = [
+        'sender'  => ['name' => 'ADESZ', 'email' => 'adeszafaya@gmail.com'],
+        'to'      => [['email' => $email, 'name' => $donor_name ?: $email]],
+        'subject' => 'Votre recu fiscal ADESZ - ' . $result['number'],
+        'htmlContent' => '<html><body style="font-family:Arial,sans-serif;color:#2D3436;margin:0;padding:0;">'
+            . '<div style="background:#2D7A3A;padding:30px 20px;text-align:center;">'
+            . '<h1 style="color:white;margin:0;font-size:28px;">ADESZ</h1>'
+            . '<p style="color:#F5C518;margin:8px 0 0;font-size:16px;">Merci pour votre generosite !</p>'
+            . '</div>'
+            . '<div style="padding:30px 40px;max-width:600px;margin:0 auto;">'
+            . '<p style="font-size:16px;">Bonjour ' . htmlspecialchars($donor_name ?: 'cher donateur') . ',</p>'
+            . '<p style="font-size:15px;line-height:1.6;">Nous vous remercions chaleureusement pour votre don de <strong>'
+            . $amount_fmt . ' EUR</strong> en faveur de l\'ADESZ.</p>'
+            . '<p style="font-size:15px;line-height:1.6;">Vous trouverez en piece jointe votre recu fiscal <strong>'
+            . $result['number'] . '</strong>.</p>'
+            . '<div style="background:#FFFBEB;border-left:4px solid #F5C518;padding:15px 20px;margin:20px 0;border-radius:4px;">'
+            . '<p style="margin:0;font-size:14px;"><strong>Avantage fiscal :</strong> ce don vous ouvre droit a une reduction '
+            . 'd\'impot de <strong>' . $deduction . ' EUR</strong> (66% du montant, art. 200 du CGI).</p>'
+            . '</div>'
+            . '<p style="font-size:15px;line-height:1.6;">Votre soutien nous aide a poursuivre nos actions pour le '
+            . 'developpement de Zafaya au Tchad.</p>'
+            . '<p style="font-size:15px;margin-top:25px;">Cordialement,<br>'
+            . '<strong>Abakar Mahamat</strong><br>'
+            . '<span style="color:#666;">President de l\'ADESZ</span></p>'
+            . '</div>'
+            . '<div style="background:#F8F7F4;padding:20px;text-align:center;font-size:12px;color:#888;">'
+            . 'ADESZ | 491 Bd Pierre Delmas, 06600 Antibes | <a href="https://adesz.fr" style="color:#2D7A3A;">www.adesz.fr</a>'
+            . '</div>'
+            . '</body></html>',
+        'attachment' => [
+            [
+                'content' => base64_encode($result['content']),
+                'name'    => $result['filename'],
+            ],
+        ],
+    ];
+
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => [
+            'accept: application/json',
+            'content-type: application/json',
+            'api-key: ' . $brevo_api_key,
+        ],
+        CURLOPT_POSTFIELDS     => json_encode($email_body),
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_CONNECTTIMEOUT => 5,
+    ]);
+
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($http_code >= 200 && $http_code < 300) {
+        error_log('Tax receipt sent: ' . $result['number'] . ' to ' . $email);
+    } else {
+        error_log('Tax receipt email failed (HTTP ' . $http_code . '): ' . $response);
+    }
 }
