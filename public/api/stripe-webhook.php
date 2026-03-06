@@ -137,7 +137,9 @@ exit;
  * Handle checkout.session.completed — initial payment (one-time or first subscription).
  */
 function handle_checkout_completed(array $session): void {
-    $email = $session['customer_email'] ?? null;
+    $email = $session['customer_email']
+        ?? $session['customer_details']['email']
+        ?? null;
     if (!$email) {
         error_log('Stripe webhook: checkout.session.completed without customer_email');
         return;
@@ -182,7 +184,9 @@ function handle_invoice_paid(array $invoice): void {
         return;
     }
 
-    $email = $invoice['customer_email'] ?? null;
+    $email = $invoice['customer_email']
+        ?? $invoice['customer_details']['email']
+        ?? null;
     if (!$email) {
         error_log('Stripe webhook: invoice.paid without customer_email');
         return;
