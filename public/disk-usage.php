@@ -31,9 +31,36 @@ function fmt(int $bytes): string {
 
 header('Content-Type: text/plain; charset=utf-8');
 
-// Scan /www (parent of /test) to see WordPress files
-$root = dirname(dirname(__FILE__));
+// Scan the entire home directory to find all disk usage
+$home = dirname(dirname(dirname(__FILE__))); // /home/adeszfz
 echo "=== DISK USAGE REPORT ===\n";
+echo "Home: $home\n\n";
+
+// First: scan home-level directories
+echo "--- HOME LEVEL ---\n";
+$home_dirs = [];
+$home_files = 0;
+foreach (scandir($home) as $item) {
+    if ($item === '.' || $item === '..') continue;
+    $path = $home . '/' . $item;
+    if (is_dir($path)) {
+        $home_dirs[$item] = dir_size($path);
+    } else {
+        $home_files += filesize($path);
+    }
+}
+arsort($home_dirs);
+$home_total = 0;
+foreach ($home_dirs as $name => $size) {
+    echo sprintf("%-35s %s\n", $name . '/', fmt($size));
+    $home_total += $size;
+}
+if ($home_files) echo sprintf("%-35s %s\n", "[home files]", fmt($home_files));
+echo "\nHOME TOTAL: " . fmt($home_total + $home_files) . "\n";
+
+// Now drill into /www
+$root = $home . '/www';
+echo "\n=== /www BREAKDOWN ===\n";
 echo "Root: $root\n\n";
 
 // Top-level directories
