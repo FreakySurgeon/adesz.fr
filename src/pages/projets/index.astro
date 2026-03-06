@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { getPostsByCategory, CATEGORIES } from '../../lib/wordpress';
 import { url } from '../../lib/utils';
@@ -9,26 +10,21 @@ const projetsAVenir = await getPostsByCategory(CATEGORIES.PROJETS_A_VENIR);
 ---
 
 <BaseLayout title="Nos projets - ADESZ" description="Découvrez les projets en cours et à venir de l'ADESZ pour le développement de Zafaya.">
-  <!-- Page Header -->
-  <div class="bg-[#F8F7F4] py-12 sm:py-16">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <nav class="mb-6 text-sm text-[#2D3436]/60">
-        <a href={url('/')} class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
-        <span class="mx-2">&gt;</span>
-        <span class="text-[#2D7A3A] font-medium">Projets</span>
-      </nav>
-      <h1 class="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-[#2D3436]">
-        Nos projets
-      </h1>
-      <p class="mt-4 text-center text-lg text-[#2D3436]/70 max-w-2xl mx-auto">
-        Les projets de l'ADESZ pour am&eacute;liorer les conditions de vie &agrave; Zafaya.
-      </p>
-    </div>
-  </div>
+  <PageHero
+    title="Nos projets"
+    subtitle="Les projets de l'ADESZ pour améliorer les conditions de vie à Zafaya."
+    image="/images/projets-hero.webp"
+    imageAlt="Construction à Zafaya"
+    imagePosition="center 40%"
+    breadcrumbs={[
+      { label: 'Accueil', href: '/' },
+      { label: 'Projets' },
+    ]}
+  />
 
   <!-- Projets en cours -->
   {projetsEnCours.length > 0 && (
-    <section class="bg-white py-12 sm:py-16">
+    <section id="en-cours" class="bg-white py-12 sm:py-16 scroll-mt-24">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2 class="text-2xl sm:text-3xl font-bold text-[#2D3436] border-l-4 border-[#2D7A3A] pl-4">
           Projets en cours
@@ -53,7 +49,7 @@ const projetsAVenir = await getPostsByCategory(CATEGORIES.PROJETS_A_VENIR);
 
   <!-- Projets à venir -->
   {projetsAVenir.length > 0 && (
-    <section class="bg-[#F8F7F4] py-12 sm:py-16">
+    <section id="a-venir" class="bg-[#F8F7F4] py-12 sm:py-16 scroll-mt-24">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2 class="text-2xl sm:text-3xl font-bold text-[#2D3436] border-l-4 border-[#F5C518] pl-4">
           Projets &agrave; venir

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import { getPostsByCategory, CATEGORIES } from '../../lib/wordpress';
 import { url } from '../../lib/utils';
@@ -8,22 +9,16 @@ const articles = await getPostsByCategory(CATEGORIES.PRESSE);
 ---
 
 <BaseLayout title="Articles de presse - ADESZ" description="La revue de presse de l'ADESZ.">
-  <!-- Page Header -->
-  <div class="bg-[#F8F7F4] py-12 sm:py-16">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <nav class="mb-6 text-sm text-[#2D3436]/60">
-        <a href={url('/')} class="hover:text-[#2D7A3A] transition-colors">Accueil</a>
-        <span class="mx-2">&gt;</span>
-        <span class="text-[#2D7A3A] font-medium">Articles de presse</span>
-      </nav>
-      <h1 class="text-center text-3xl sm:text-4xl md:text-5xl font-bold text-[#2D3436]">
-        Articles de presse
-      </h1>
-      <p class="mt-4 text-center text-lg text-[#2D3436]/70 max-w-2xl mx-auto">
-        La revue de presse de l'ADESZ.
-      </p>
-    </div>
-  </div>
+  <PageHero
+    title="Articles de presse"
+    subtitle="La revue de presse de l'ADESZ."
+    image="/images/Image4.jpg"
+    imageAlt="Communauté de Zafaya"
+    breadcrumbs={[
+      { label: 'Accueil', href: '/' },
+      { label: 'Articles de presse' },
+    ]}
+  />
 
   <!-- Articles -->
   {articles.length > 0 && (

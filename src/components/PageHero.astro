@@ -6,10 +6,11 @@ interface Props {
   subtitle?: string;
   image: string;
   imageAlt: string;
+  imagePosition?: string;
   breadcrumbs: Array<{ label: string; href?: string }>;
 }
 
-const { title, subtitle, image, imageAlt, breadcrumbs } = Astro.props;
+const { title, subtitle, image, imageAlt, imagePosition, breadcrumbs } = Astro.props;
 ---
 
 <section class="relative flex min-h-[40vh] items-end overflow-hidden grain-overlay sm:min-h-[45vh]">
@@ -18,6 +19,7 @@ const { title, subtitle, image, imageAlt, breadcrumbs } = Astro.props;
     src={image.startsWith('/') ? url(image) : image}
     alt={imageAlt}
     class="absolute inset-0 h-full w-full object-cover"
+    style={imagePosition ? `object-position: ${imagePosition}` : undefined}
     loading="eager"
   />
 
