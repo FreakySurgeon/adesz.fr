@@ -11,9 +11,17 @@ import_csv() {
     local list_id="$2"
     local label="$3"
 
-    # Read file, strip BOM
+    # Read file, strip BOM, convert semicolon-separated to comma-separated
+    # (Brevo API fileBody expects comma-separated values)
+    # Fields containing commas are quoted to preserve data integrity
     local content
-    content=$(sed '1s/^\xEF\xBB\xBF//' "$file")
+    content=$(sed '1s/^\xEF\xBB\xBF//' "$file" | python3 -c "
+import sys, csv, io
+reader = csv.reader(sys.stdin, delimiter=';')
+writer = csv.writer(sys.stdout, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+for row in reader:
+    writer.writerow(row)
+")
 
     echo "Importing $label ($file) into list $list_id..."
 
@@ -48,6 +56,9 @@ import_csv() {
     fi
 }
 
+# Newsletter first (email-only, no attributes to overwrite)
+import_csv "brevo-import/brevo-import-mailing-adesz.csv" 6 "Newsletter ADESZ"
+# Then lists with full attributes (TYPE, ADRESSE, etc.)
 import_csv "brevo-import/brevo-import-tous.csv" 5 "Tous les contacts"
 import_csv "brevo-import/brevo-import-adherents.csv" 3 "Adherents"
 import_csv "brevo-import/brevo-import-donateurs.csv" 4 "Donateurs"
