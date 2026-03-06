@@ -13,9 +13,9 @@ $stripe_webhook_secret = trim('whsec_REPLACE_ME');
 
 // Brevo (ex-Sendinblue) configuration
 $brevo_api_key = trim('xkeysib-REPLACE_ME');
-$brevo_list_adherents = (int)trim('0'); // ID liste Brevo "Adhérents"
-$brevo_list_donateurs = (int)trim('0'); // ID liste Brevo "Donateurs"
-$brevo_list_tous = (int)trim('0');      // ID liste Brevo "Tous"
+$brevo_list_adherents = (int)trim('LIST_ADHERENTS_REPLACE_ME');
+$brevo_list_donateurs = (int)trim('LIST_DONATEURS_REPLACE_ME');
+$brevo_list_tous = (int)trim('LIST_TOUS_REPLACE_ME');
 
 // Admin notification email (for Brevo sync failures)
 $admin_email = trim('admin@REPLACE_ME');

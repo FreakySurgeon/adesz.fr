@@ -27,9 +27,9 @@ jobs:
           sed -i "s|\$base_path = '';|\$base_path = '/test';|" dist/api/config.php
           sed -i "s|whsec_REPLACE_ME|${{ secrets.STRIPE_WEBHOOK_SECRET_TEST }}|" dist/api/config.php
           sed -i "s|xkeysib-REPLACE_ME|${{ secrets.BREVO_API_KEY }}|" dist/api/config.php
-          sed -i "s|trim('0')|trim('${{ secrets.BREVO_LIST_ADHERENTS }}')|1" dist/api/config.php
-          sed -i "s|trim('0')|trim('${{ secrets.BREVO_LIST_DONATEURS }}')|1" dist/api/config.php
-          sed -i "s|trim('0')|trim('${{ secrets.BREVO_LIST_TOUS }}')|1" dist/api/config.php
+          sed -i "s|LIST_ADHERENTS_REPLACE_ME|${{ secrets.BREVO_LIST_ADHERENTS }}|" dist/api/config.php
+          sed -i "s|LIST_DONATEURS_REPLACE_ME|${{ secrets.BREVO_LIST_DONATEURS }}|" dist/api/config.php
+          sed -i "s|LIST_TOUS_REPLACE_ME|${{ secrets.BREVO_LIST_TOUS }}|" dist/api/config.php
           sed -i "s|admin@REPLACE_ME|${{ secrets.ADMIN_EMAIL }}|" dist/api/config.php
 
       - name: Deploy to adesz.fr/test via FTP
