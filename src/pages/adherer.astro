@@ -152,6 +152,32 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             </p>
           </div>
 
+          <!-- Donor Info for tax receipt (visible for don only, hidden for adhesion/combo) -->
+          <div id="donor-section" style="display:none" class="mt-6">
+            <label class="block text-sm font-semibold text-[#2D3436] mb-1">
+              Pour votre re&ccedil;u fiscal
+            </label>
+            <p class="text-xs text-[#2D3436]/50 mb-3">
+              Ces informations sont n&eacute;cessaires pour &eacute;tablir votre re&ccedil;u fiscal (Cerfa n&deg; 11580).
+            </p>
+            <div class="space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <input type="text" id="donor-prenom" placeholder="Pr&eacute;nom *" required
+                  class="rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+                <input type="text" id="donor-nom" placeholder="Nom *" required
+                  class="rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+              </div>
+              <input type="text" id="donor-adresse" placeholder="Adresse *" required
+                class="w-full rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+              <div class="grid grid-cols-3 gap-3">
+                <input type="text" id="donor-cp" placeholder="Code postal *" required
+                  class="rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+                <input type="text" id="donor-commune" placeholder="Commune *" required
+                  class="col-span-2 rounded-xl border-2 border-[#2D3436]/15 bg-[#F8F7F4] px-4 py-3 text-sm text-[#2D3436] placeholder-[#2D3436]/40 transition-all focus:border-[#2D7A3A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2D7A3A]/20" />
+              </div>
+            </div>
+          </div>
+
           <!-- Frequency Selector (visible for don + combo, hidden for adhesion) -->
           <div id="frequency-section" class="mt-6">
             <label class="block text-sm font-semibold text-[#2D3436] mb-3">
@@ -334,6 +360,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     const amountSection = document.getElementById('amount-section')!;
     const frequencySection = document.getElementById('frequency-section')!;
     const membershipSection = document.getElementById('membership-section')!;
+    const donorSection = document.getElementById('donor-section')!;
     const amountBtns = document.querySelectorAll<HTMLButtonElement>('.amount-btn');
     const customInput = document.getElementById('custom-amount') as HTMLInputElement;
     const freqBtns = document.querySelectorAll<HTMLButtonElement>('.freq-btn');
@@ -373,14 +400,33 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       };
     }
 
+    function getDonorData() {
+      return {
+        nom: (document.getElementById('donor-nom') as HTMLInputElement).value.trim(),
+        prenom: (document.getElementById('donor-prenom') as HTMLInputElement).value.trim(),
+        adresse: (document.getElementById('donor-adresse') as HTMLInputElement).value.trim(),
+        cp: (document.getElementById('donor-cp') as HTMLInputElement).value.trim(),
+        commune: (document.getElementById('donor-commune') as HTMLInputElement).value.trim(),
+      };
+    }
+
+    function isDonorFormValid(): boolean {
+      const d = getDonorData();
+      return !!(d.nom && d.prenom && d.adresse && d.cp && d.commune);
+    }
+
     function isMemberFormValid(): boolean {
       const d = getMemberData();
       return !!(d.nom && d.prenom && d.adresse && d.cp && d.commune && d.email);
     }
 
     function isFormValid(): boolean {
-      const needsMember = activeTab === 'adhesion' || activeTab === 'combo';
-      if (needsMember && !isMemberFormValid()) return false;
+      if (activeTab === 'adhesion' || activeTab === 'combo') {
+        if (!isMemberFormValid()) return false;
+      }
+      if (activeTab === 'don') {
+        if (!isDonorFormValid()) return false;
+      }
       if (activeTab === 'adhesion') return true;
       return getEffectiveAmount() >= 1;
     }
@@ -404,9 +450,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     function updateVisibility() {
       const showDonFields = activeTab === 'don' || activeTab === 'combo';
       const showMemberFields = activeTab === 'adhesion' || activeTab === 'combo';
+      const showDonorFields = activeTab === 'don';
       amountSection.style.display = showDonFields ? '' : 'none';
       frequencySection.style.display = showDonFields ? '' : 'none';
       membershipSection.style.display = showMemberFields ? '' : 'none';
+      donorSection.style.display = showDonorFields ? '' : 'none';
       comboNote.classList.toggle('hidden', activeTab !== 'combo');
     }
 
@@ -520,6 +568,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       updateSubmitButton();
     });
 
+    // Revalidate on donor form input
+    donorSection.addEventListener('input', () => {
+      hideError();
+      updateSubmitButton();
+    });
+
     // Submit
     submitBtn.addEventListener('click', async () => {
       if (!isFormValid() || isLoading) return;
@@ -532,8 +586,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           ? ADHESION_PRICE * 100
           : getEffectiveAmount() * 100;
 
-        const needsMember = activeTab === 'adhesion' || activeTab === 'combo';
-        const member = needsMember ? getMemberData() : null;
+        let member = null;
+        if (activeTab === 'adhesion' || activeTab === 'combo') {
+          member = getMemberData();
+        } else if (activeTab === 'don') {
+          member = getDonorData();
+        }
 
         const basePath = document.getElementById('payment-form')?.dataset.base || '';
         const response = await fetch(basePath + '/api/create-checkout.php', {

@@ -44,6 +44,85 @@ function get_next_receipt_number(): string {
 }
 
 /**
+ * Convert a numeric amount to French words.
+ * Handles amounts up to 999 999,99 EUR.
+ *
+ * @param float $amount e.g. 25.50
+ * @return string e.g. "vingt-cinq euros et cinquante centimes"
+ */
+function nombre_en_lettres(float $amount): string {
+    $units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
+              'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+    $tens  = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
+
+    $convert_below_1000 = function (int $n) use ($units, $tens, &$convert_below_1000): string {
+        if ($n === 0) return '';
+        if ($n < 20) return $units[$n];
+
+        if ($n < 100) {
+            $t = intdiv($n, 10);
+            $u = $n % 10;
+
+            // 70-79: soixante-dix, soixante-et-onze, ...
+            if ($t === 7) {
+                if ($u === 0) return 'soixante-dix';
+                if ($u === 1) return 'soixante-et-onze';
+                return 'soixante-' . $units[10 + $u];
+            }
+            // 90-99: quatre-vingt-dix, quatre-vingt-onze, ...
+            if ($t === 9) {
+                if ($u === 0) return 'quatre-vingt-dix';
+                return 'quatre-vingt-' . $units[10 + $u];
+            }
+            // 80-89
+            if ($t === 8) {
+                if ($u === 0) return 'quatre-vingts';
+                return 'quatre-vingt-' . $units[$u];
+            }
+
+            if ($u === 0) return $tens[$t];
+            if ($u === 1 && $t <= 6) return $tens[$t] . '-et-un';
+            return $tens[$t] . '-' . $units[$u];
+        }
+
+        $h = intdiv($n, 100);
+        $remainder = $n % 100;
+        $prefix = ($h === 1) ? 'cent' : $units[$h] . ' cent';
+        if ($remainder === 0 && $h > 1) $prefix .= 's';
+        if ($remainder === 0) return $prefix;
+        return $prefix . ' ' . $convert_below_1000($remainder);
+    };
+
+    $euros = (int) floor($amount);
+    $cents = (int) round(($amount - $euros) * 100);
+
+    $parts = [];
+
+    if ($euros >= 1000) {
+        $thousands = intdiv($euros, 1000);
+        $remainder = $euros % 1000;
+        $t = ($thousands === 1) ? 'mille' : $convert_below_1000($thousands) . ' mille';
+        if ($remainder > 0) {
+            $t .= ' ' . $convert_below_1000($remainder);
+        }
+        $parts[] = $t;
+    } elseif ($euros > 0) {
+        $parts[] = $convert_below_1000($euros);
+    } else {
+        $parts[] = "z\xc3\xa9ro";
+    }
+
+    $parts[] = ($euros <= 1) ? 'euro' : 'euros';
+
+    if ($cents > 0) {
+        $parts[] = 'et ' . $convert_below_1000($cents);
+        $parts[] = ($cents <= 1) ? 'centime' : 'centimes';
+    }
+
+    return implode(' ', $parts);
+}
+
+/**
  * Generate a tax receipt PDF.
  *
  * @param array $data Keys: email, prenom, nom, adresse, cp, commune, amount, date, type
@@ -107,17 +186,19 @@ function generate_receipt_pdf(array $data) {
     $type_upper = ($data['type'] ?? 'don') === 'adhesion' ? 'COTISATION' : 'DON';
     $pdf->Cell(0, 14, "RECU FISCAL - " . $type_upper . " " . $year, 0, 1, 'C');
 
-    // --- CGI reference ---
-    $pdf->SetFont('Poppins', '', 7.5);
+    // --- Cerfa certification mention ---
+    $pdf->SetFont('Poppins', 'I', 7);
     $pdf->SetTextColor(100, 100, 100);
-    $pdf->Cell(0, 8, "Articles 200 et 238 bis du Code G\xc3\xa9n\xc3\xa9ral des Imp\xc3\xb4ts", 0, 1, 'C');
+    $pdf->Ln(2);
+    $pdf->SetX(20);
+    $pdf->MultiCell(170, 4, "L'organisme certifie que les dons et versements qu'il re\xc3\xa7oit ouvrent droit \xc3\xa0 la r\xc3\xa9duction d'imp\xc3\xb4t pr\xc3\xa9vue aux articles 200, 238 bis et 978 du Code G\xc3\xa9n\xc3\xa9ral des Imp\xc3\xb4ts.", 0, 'C');
 
     // --- Beneficiary box ---
     $pdf->Ln(3);
     $y = $pdf->GetY();
     $pdf->SetFillColor(248, 247, 244);
     $pdf->SetDrawColor(45, 122, 58);
-    $pdf->Rect(15, $y, 180, 42, 'DF');
+    $pdf->Rect(15, $y, 180, 46, 'DF');
 
     $pdf->SetXY(20, $y + 3);
     $pdf->SetFont('Poppins', 'B', 10);
@@ -132,6 +213,10 @@ function generate_receipt_pdf(array $data) {
     $pdf->SetFont('Poppins', '', 7.5);
     $pdf->Cell(0, 4, "Association loi 1901, d\xc3\xa9clar\xc3\xa9" . 'e le 04 novembre 2022', 0, 1, 'L');
     $pdf->SetX(20);
+    $pdf->SetFont('Poppins', 'B', 7.5);
+    $pdf->Cell(0, 4, "Association d'int\xc3\xa9r\xc3\xaat g\xc3\xa9n\xc3\xa9ral", 0, 1, 'L');
+    $pdf->SetX(20);
+    $pdf->SetFont('Poppins', '', 7.5);
     $pdf->Cell(0, 4, "Enregistr\xc3\xa9" . "e \xc3\xa0 la Pr\xc3\xa9fecture des Alpes-Maritimes sous le n\xc2\xb0 W061016106", 0, 1, 'L');
     $pdf->SetX(20);
     $pdf->Cell(0, 4, "Sans but lucratif, \xc3\xa0 caract\xc3\xa8re social", 0, 1, 'L');
@@ -175,7 +260,7 @@ function generate_receipt_pdf(array $data) {
     $pdf->Ln(8);
     $y = $pdf->GetY();
     $pdf->SetFillColor(45, 122, 58);
-    $pdf->Rect(15, $y, 180, 22, 'F');
+    $pdf->Rect(15, $y, 180, 30, 'F');
 
     $pdf->SetXY(20, $y + 3);
     $pdf->SetFont('Poppins', '', 8.5);
@@ -185,10 +270,13 @@ function generate_receipt_pdf(array $data) {
     $pdf->SetX(20);
     $pdf->Cell(0, 4, "consenti \xc3\xa0 titre gratuit et sans contrepartie directe ou indirecte", 0, 1, 'L');
 
-    $pdf->SetXY(20, $y + 13);
+    $pdf->SetXY(20, $y + 11);
     $pdf->SetFont('Poppins', 'B', 16);
     $amount_str = number_format($data['amount'] ?? 0, 2, ',', ' ');
     $pdf->Cell(0, 8, $amount_str . ' EUR', 0, 1, 'C');
+    $pdf->SetFont('Poppins', 'I', 8);
+    $amount_words = nombre_en_lettres($data['amount'] ?? 0);
+    $pdf->Cell(0, 5, '(' . ucfirst($amount_words) . ')', 0, 1, 'C');
 
     // --- BOI + Payment details ---
     $pdf->Ln(3);
@@ -210,6 +298,13 @@ function generate_receipt_pdf(array $data) {
     $pdf->Cell(45, 5, 'Mode de paiement :', 0, 0, 'L');
     $pdf->SetFont('Poppins', 'B', 9);
     $pdf->Cell(0, 5, 'Carte bancaire (Stripe)', 0, 1, 'L');
+
+    $pdf->SetX(20);
+    $pdf->SetFont('Poppins', '', 9);
+    $pdf->Cell(45, 5, 'Nature du don :', 0, 0, 'L');
+    $pdf->SetFont('Poppins', 'B', 9);
+    $nature = ($data['type'] ?? 'don') === 'adhesion' ? "Cotisation num\xc3\xa9raire" : "Don num\xc3\xa9raire";
+    $pdf->Cell(0, 5, $nature, 0, 1, 'L');
 
     // --- Tax deduction box (yellow) ---
     $pdf->Ln(5);
