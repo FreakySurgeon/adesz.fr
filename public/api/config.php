@@ -19,3 +19,12 @@ $brevo_list_tous = (int)trim('LIST_TOUS_REPLACE_ME');
 
 // Admin notification email (for Brevo sync failures)
 $admin_email = trim('admin@REPLACE_ME');
+
+// MySQL database (OVH WordPress shared DB)
+$db_host = trim('DB_HOST_REPLACE_ME');
+$db_name = trim('DB_NAME_REPLACE_ME');
+$db_user = trim('DB_USER_REPLACE_ME');
+$db_pass = trim('DB_PASS_REPLACE_ME');
+
+// Admin key for cron scripts (no WP auth in CLI)
+$admin_key = trim('ADMIN_KEY_REPLACE_ME');

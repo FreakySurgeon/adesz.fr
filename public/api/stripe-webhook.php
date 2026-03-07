@@ -10,6 +10,7 @@
  */
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
 
 // ---------------------------------------------------------------------------
 // Only POST allowed
@@ -171,6 +172,27 @@ function handle_checkout_completed(array $session): void {
     // Upsert contact in Brevo
     sync_to_brevo($email, $attributes, $list_ids);
 
+    // Store donation in MySQL
+    try {
+        $type_map_db = ['adherent' => 'adhesion', 'donateur' => 'don', 'combo' => 'combo'];
+        insert_donation([
+            'email'             => $email,
+            'prenom'            => $metadata['prenom'] ?? '',
+            'nom'               => $metadata['nom'] ?? '',
+            'adresse'           => $metadata['adresse'] ?? '',
+            'cp'                => $metadata['cp'] ?? '',
+            'commune'           => $metadata['commune'] ?? '',
+            'amount'            => $amount_total,
+            'date_don'          => date('Y-m-d'),
+            'type'              => $type_map_db[$type] ?? 'don',
+            'mode_paiement'     => 'carte',
+            'source'            => 'stripe',
+            'stripe_payment_id' => $session['payment_intent'] ?? $session['subscription'] ?? null,
+        ]);
+    } catch (\Throwable $e) {
+        error_log('MySQL insert_donation failed (checkout) for ' . $email . ': ' . $e->getMessage());
+    }
+
     // Send tax receipt
     send_tax_receipt($email, $metadata, $amount_total, $type);
 }
@@ -207,6 +229,27 @@ function handle_invoice_paid(array $invoice): void {
     $list_ids = get_brevo_list_ids($type);
 
     sync_to_brevo($email, $attributes, $list_ids);
+
+    // Store donation in MySQL
+    try {
+        $type_map_db = ['adherent' => 'adhesion', 'donateur' => 'don', 'combo' => 'combo'];
+        insert_donation([
+            'email'             => $email,
+            'prenom'            => $metadata['prenom'] ?? '',
+            'nom'               => $metadata['nom'] ?? '',
+            'adresse'           => $metadata['adresse'] ?? '',
+            'cp'                => $metadata['cp'] ?? '',
+            'commune'           => $metadata['commune'] ?? '',
+            'amount'            => $amount,
+            'date_don'          => date('Y-m-d'),
+            'type'              => $type_map_db[$type] ?? 'don',
+            'mode_paiement'     => 'carte',
+            'source'            => 'stripe',
+            'stripe_payment_id' => $invoice['payment_intent'] ?? null,
+        ]);
+    } catch (\Throwable $e) {
+        error_log('MySQL insert_donation failed (invoice) for ' . $email . ': ' . $e->getMessage());
+    }
 
     // Send tax receipt for renewal
     send_tax_receipt($email, $metadata, $amount, $type);

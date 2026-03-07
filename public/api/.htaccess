@@ -2,3 +2,8 @@
 <FilesMatch "\.(json|pdf)$">
     Require all denied
 </FilesMatch>
+
+# Block direct access to db.php and config.php
+<FilesMatch "^(db|config)\.php$">
+    Require all denied
+</FilesMatch>

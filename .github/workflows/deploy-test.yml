@@ -31,6 +31,11 @@ jobs:
           sed -i "s|LIST_DONATEURS_REPLACE_ME|${{ secrets.BREVO_LIST_DONATEURS }}|" dist/api/config.php
           sed -i "s|LIST_TOUS_REPLACE_ME|${{ secrets.BREVO_LIST_TOUS }}|" dist/api/config.php
           sed -i "s|admin@REPLACE_ME|${{ secrets.ADMIN_EMAIL }}|" dist/api/config.php
+          sed -i "s|DB_HOST_REPLACE_ME|${{ secrets.DB_HOST }}|" dist/api/config.php
+          sed -i "s|DB_NAME_REPLACE_ME|${{ secrets.DB_NAME }}|" dist/api/config.php
+          sed -i "s|DB_USER_REPLACE_ME|${{ secrets.DB_USER }}|" dist/api/config.php
+          sed -i "s|DB_PASS_REPLACE_ME|${{ secrets.DB_PASS }}|" dist/api/config.php
+          sed -i "s|ADMIN_KEY_REPLACE_ME|${{ secrets.ADMIN_KEY }}|" dist/api/config.php
 
       - name: Deploy to adesz.fr/test via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
