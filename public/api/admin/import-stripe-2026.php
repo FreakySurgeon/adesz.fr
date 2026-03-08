@@ -5,8 +5,15 @@
  * DELETE AFTER USE.
  */
 
-require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db.php';
+
+// Auth via ADMIN_KEY instead of WordPress
+global $admin_key;
+if (($_GET['key'] ?? '') !== $admin_key) {
+    http_response_code(403);
+    die('Forbidden - add ?key=ADMIN_KEY');
+}
 
 header('Content-Type: text/plain; charset=utf-8');
 
