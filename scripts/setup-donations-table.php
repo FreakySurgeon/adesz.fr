@@ -35,6 +35,25 @@ try {
     ");
     echo "OK: receipt_counters table created (or already exists).\n";
 
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS contacts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            email VARCHAR(255) NULL,
+            prenom VARCHAR(255) NOT NULL DEFAULT '',
+            nom VARCHAR(255) NOT NULL DEFAULT '',
+            adresse VARCHAR(500) NOT NULL DEFAULT '',
+            cp VARCHAR(10) NOT NULL DEFAULT '',
+            commune VARCHAR(255) NOT NULL DEFAULT '',
+            telephone VARCHAR(50) NOT NULL DEFAULT '',
+            type VARCHAR(50) NOT NULL DEFAULT '',
+            source VARCHAR(50) NOT NULL DEFAULT 'brevo',
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE INDEX uq_email (email),
+            INDEX idx_nom (nom, prenom)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    echo "OK: contacts table created (or already exists).\n";
+
     // Add UNIQUE indexes if they don't exist
     try {
         $db->exec("ALTER TABLE donations ADD UNIQUE INDEX uq_receipt_number (receipt_number)");

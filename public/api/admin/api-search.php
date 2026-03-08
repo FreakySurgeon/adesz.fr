@@ -10,4 +10,16 @@ if (strlen($q) < 2) {
     exit;
 }
 
-echo json_encode(search_donors($q));
+// Search contacts table first (Brevo-synced), then donations as fallback
+$results = search_contacts($q, 10);
+
+// Also search donations for donors not in contacts table
+$donation_donors = search_donors($q, 10);
+$existing_emails = array_filter(array_column($results, 'email'));
+foreach ($donation_donors as $d) {
+    if (empty($d['email']) || !in_array($d['email'], $existing_emails, true)) {
+        $results[] = $d;
+    }
+}
+
+echo json_encode(array_slice($results, 0, 10));

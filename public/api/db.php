@@ -152,3 +152,61 @@ function update_donation(int $id, array $data): void {
     $sql = 'UPDATE donations SET ' . implode(', ', $sets) . ' WHERE id = ?';
     get_db()->prepare($sql)->execute($values);
 }
+
+// ── Contacts ──
+
+function upsert_contact(array $data): void {
+    $email = trim($data['email'] ?? '');
+
+    if ($email) {
+        // Upsert by email — only overwrite non-empty fields
+        $sql = "INSERT INTO contacts (email, prenom, nom, adresse, cp, commune, telephone, type, source)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    prenom = IF(VALUES(prenom) != '', VALUES(prenom), prenom),
+                    nom = IF(VALUES(nom) != '', VALUES(nom), nom),
+                    adresse = IF(VALUES(adresse) != '', VALUES(adresse), adresse),
+                    cp = IF(VALUES(cp) != '', VALUES(cp), cp),
+                    commune = IF(VALUES(commune) != '', VALUES(commune), commune),
+                    telephone = IF(VALUES(telephone) != '', VALUES(telephone), telephone),
+                    type = IF(VALUES(type) != '', VALUES(type), type),
+                    source = VALUES(source)";
+        get_db()->prepare($sql)->execute([
+            $email,
+            $data['prenom'] ?? '', $data['nom'] ?? '',
+            $data['adresse'] ?? '', $data['cp'] ?? '', $data['commune'] ?? '',
+            $data['telephone'] ?? '', $data['type'] ?? '',
+            $data['source'] ?? 'manual',
+        ]);
+    } else {
+        // No email — insert only (no dedup possible)
+        $sql = "INSERT INTO contacts (prenom, nom, adresse, cp, commune, telephone, type, source)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        get_db()->prepare($sql)->execute([
+            $data['prenom'] ?? '', $data['nom'] ?? '',
+            $data['adresse'] ?? '', $data['cp'] ?? '', $data['commune'] ?? '',
+            $data['telephone'] ?? '', $data['type'] ?? '',
+            $data['source'] ?? 'manual',
+        ]);
+    }
+}
+
+function search_contacts(string $query, int $limit = 10): array {
+    $like = '%' . $query . '%';
+    $sql = "SELECT email, prenom, nom, adresse, cp, commune, telephone
+            FROM contacts
+            WHERE nom LIKE ? COLLATE utf8mb4_unicode_ci
+               OR prenom LIKE ? COLLATE utf8mb4_unicode_ci
+               OR email LIKE ? COLLATE utf8mb4_unicode_ci
+               OR CONCAT(nom, ' ', prenom) LIKE ? COLLATE utf8mb4_unicode_ci
+            ORDER BY nom, prenom
+            LIMIT ?";
+    $stmt = get_db()->prepare($sql);
+    $stmt->bindValue(1, $like);
+    $stmt->bindValue(2, $like);
+    $stmt->bindValue(3, $like);
+    $stmt->bindValue(4, $like);
+    $stmt->bindValue(5, $limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}

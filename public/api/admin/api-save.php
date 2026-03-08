@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../brevo-sync.php';
 
 header('Content-Type: application/json');
 
@@ -73,6 +75,32 @@ try {
         }
         $id = insert_donation($input);
         $donation = get_donation_by_id($id);
+    }
+
+    // Upsert local contact + sync to Brevo (best-effort)
+    $contact_email = trim($donation['email'] ?? '');
+    try {
+        upsert_contact([
+            'email'     => $contact_email ?: null,
+            'prenom'    => $donation['prenom'] ?? '',
+            'nom'       => $donation['nom'] ?? '',
+            'adresse'   => $donation['adresse'] ?? '',
+            'cp'        => $donation['cp'] ?? '',
+            'commune'   => $donation['commune'] ?? '',
+            'telephone' => $donation['telephone'] ?? '',
+            'type'      => $donation['type'] ?? '',
+            'source'    => 'manual',
+        ]);
+    } catch (Throwable $e) {
+        error_log('Contact upsert failed: ' . $e->getMessage());
+    }
+
+    if ($contact_email) {
+        try {
+            sync_contact_to_brevo($donation);
+        } catch (Throwable $e) {
+            error_log('Brevo sync failed for manual donation: ' . $e->getMessage());
+        }
     }
 
     echo json_encode(['success' => true, 'donation' => $donation]);
