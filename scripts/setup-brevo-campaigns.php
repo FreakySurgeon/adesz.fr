@@ -116,21 +116,28 @@ function get_existing_templates(string $api_key): array {
 // Helper: Create template (idempotent)
 // ---------------------------------------------------------------------------
 function create_template(string $name, string $subject, string $html, string $api_key, array &$existing): ?int {
+    $fields = [
+        'subject'     => $subject,
+        'htmlContent' => $html,
+        'sender'      => ['name' => 'ADESZ', 'email' => 'adeszafaya@gmail.com'],
+        'replyTo'     => 'adeszafaya@gmail.com',
+        'isActive'    => true,
+    ];
+
     if (isset($existing[$name])) {
-        echo "  · \"$name\" already exists (ID: {$existing[$name]}, skipped)\n";
-        return $existing[$name];
+        // Update existing template
+        $id = $existing[$name];
+        $result = brevo_request('PUT', '/v3/smtp/templates/' . $id, json_encode($fields), $api_key);
+        if ($result['code'] === 204) {
+            echo "  ✓ \"$name\" updated (ID: $id)\n";
+            return $id;
+        }
+        echo "  ✗ \"$name\" update failed (HTTP {$result['code']}): {$result['body']}\n";
+        return $id;
     }
 
-    $body = json_encode([
-        'templateName' => $name,
-        'subject'      => $subject,
-        'htmlContent'  => $html,
-        'sender'       => ['name' => 'ADESZ', 'email' => 'adeszafaya@gmail.com'],
-        'replyTo'      => 'adeszafaya@gmail.com',
-        'isActive'     => true,
-    ]);
-
-    $result = brevo_request('POST', '/v3/smtp/templates', $body, $api_key);
+    $fields['templateName'] = $name;
+    $result = brevo_request('POST', '/v3/smtp/templates', json_encode($fields), $api_key);
     $response = json_decode($result['body'], true);
 
     if ($result['code'] === 201 && isset($response['id'])) {
