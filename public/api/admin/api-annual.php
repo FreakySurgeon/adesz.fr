@@ -104,8 +104,11 @@ function handle_send(int $year, bool $test_mode): void {
     $errors = [];
     $sans_email = [];
 
-    foreach ($donors as $donor) {
-        // Skip donors without email (unless test mode)
+    // Test mode: only send one receipt (first donor) to admin email
+    $donors_to_process = $test_mode ? [reset($donors)] : $donors;
+
+    foreach ($donors_to_process as $donor) {
+        // Skip donors without email (in real mode only)
         if (!$test_mode && empty($donor['email'])) {
             $sans_email[] = trim($donor['prenom'] . ' ' . $donor['nom']);
             continue;
@@ -117,9 +120,11 @@ function handle_send(int $year, bool $test_mode): void {
             continue;
         }
 
-        // Mark donations with annual receipt number
-        $donation_ids = array_map(fn($d) => $d['id'], $donor['donations']);
-        set_annual_receipt_number($donation_ids, $result['number']);
+        // Mark donations with annual receipt number (skip in test mode)
+        if (!$test_mode) {
+            $donation_ids = array_map(fn($d) => $d['id'], $donor['donations']);
+            set_annual_receipt_number($donation_ids, $result['number']);
+        }
 
         // Send email
         $recipient_email = $test_mode ? $admin_email : $donor['email'];

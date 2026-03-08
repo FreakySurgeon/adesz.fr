@@ -981,7 +981,7 @@ $current_user = wp_get_current_user();
         });
 
         newTest.addEventListener('click', function() {
-            if (!confirm('Envoyer tous les re\u00e7us sur l\u2019adresse admin ?')) return;
+            if (!confirm('Envoyer un re\u00e7u test (1er donateur) sur l\u2019adresse admin. Continuer ?')) return;
             doSend('test_send', year, newTest);
         });
 
