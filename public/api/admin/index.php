@@ -379,9 +379,9 @@ $current_user = wp_get_current_user();
                 <div id="receipt-preview" style="border:1px solid #ddd; border-radius:5px; overflow:hidden; margin-bottom:16px;"></div>
 
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn btn-yellow" id="btn-edit-donation">Modifier</button>
                     <button class="btn btn-primary" id="btn-send-receipt" style="display:none;">Envoyer le re&ccedil;u par email</button>
                     <button class="btn btn-outline" id="btn-download-receipt">T&eacute;l&eacute;charger PDF</button>
-                    <button class="btn btn-yellow" id="btn-edit-donation">Modifier</button>
                 </div>
 
                 <div class="msg msg-success" id="receipt-success"></div>
@@ -432,6 +432,7 @@ $current_user = wp_get_current_user();
                             <th>Type</th>
                             <th>Mode</th>
                             <th>Source</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="dl-tbody"></tbody>
@@ -1018,6 +1019,28 @@ $current_user = wp_get_current_user();
         });
     }
 
+    // Edit a donation from the donations list (Tab 2 → Tab 1)
+    function editFromList(donation) {
+        editDonationId = parseInt(donation.id, 10);
+        document.getElementById('f-prenom').value = donation.prenom || '';
+        document.getElementById('f-nom').value = donation.nom || '';
+        document.getElementById('f-email').value = donation.email || '';
+        document.getElementById('f-telephone').value = donation.telephone || '';
+        document.getElementById('f-adresse').value = donation.adresse || '';
+        document.getElementById('f-code_postal').value = donation.cp || '';
+        document.getElementById('f-commune').value = donation.commune || '';
+        document.getElementById('f-amount').value = donation.amount || '';
+        document.getElementById('f-date').value = donation.date_don || '';
+        document.getElementById('f-type').value = donation.type || 'don';
+        document.getElementById('f-mode').value = donation.mode_paiement || 'cheque';
+        // Switch to Tab 1
+        document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+        document.querySelector('[data-tab="tab-entry"]').classList.add('active');
+        document.getElementById('tab-entry').classList.add('active');
+        showForm();
+    }
+
     // ── Tab 2: Donations list ──
 
     var dlYear = document.getElementById('dl-year');
@@ -1088,7 +1111,7 @@ $current_user = wp_get_current_user();
         if (donations.length === 0) {
             var tr = document.createElement('tr');
             var td = document.createElement('td');
-            td.colSpan = 8;
+            td.colSpan = 9;
             td.textContent = 'Aucun don trouv\u00e9.';
             td.style.textAlign = 'center';
             td.style.padding = '20px';
@@ -1116,6 +1139,20 @@ $current_user = wp_get_current_user();
                     if (f.style) td.style.cssText = f.style;
                     tr.appendChild(td);
                 });
+
+                // Actions column
+                var tdAction = document.createElement('td');
+                if (!d.receipt_number) {
+                    var btnEdit = document.createElement('button');
+                    btnEdit.className = 'btn btn-yellow';
+                    btnEdit.style.cssText = 'padding:4px 12px; font-size:12px;';
+                    btnEdit.textContent = 'Modifier';
+                    btnEdit.addEventListener('click', (function(donation) {
+                        return function() { editFromList(donation); };
+                    })(d));
+                    tdAction.appendChild(btnEdit);
+                }
+                tr.appendChild(tdAction);
 
                 dlTbody.appendChild(tr);
             });

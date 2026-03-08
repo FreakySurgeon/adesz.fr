@@ -3,8 +3,14 @@ require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../config.php';
 
-$action = $_GET['action'] ?? $_POST['action'] ?? '';
-$year = (int) ($_GET['year'] ?? $_POST['year'] ?? date('Y') - 1);
+// Parse JSON body for POST requests (JS sends Content-Type: application/json)
+$_JSON = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_JSON = json_decode(file_get_contents('php://input'), true) ?: [];
+}
+
+$action = $_GET['action'] ?? $_JSON['action'] ?? $_POST['action'] ?? '';
+$year = (int) ($_GET['year'] ?? $_JSON['year'] ?? $_POST['year'] ?? date('Y') - 1);
 
 if ($year < 2020 || $year > (int) date('Y')) {
     http_response_code(400);
