@@ -1041,6 +1041,39 @@ $current_user = wp_get_current_user();
         showForm();
     }
 
+    // Send receipt directly from the donations list
+    function sendReceiptFromList(donation, btn) {
+        if (!confirm('Envoyer le re\u00e7u fiscal \u00e0 ' + donation.email + ' ?')) return;
+        var origText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Envoi\u2026';
+
+        fetch('api-receipt.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ donation_id: parseInt(donation.id, 10), action: 'send' })
+        })
+        .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, body: j }; }); })
+        .then(function(res) {
+            if (res.ok && res.body.success) {
+                btn.textContent = 'Envoy\u00e9 \u2713';
+                btn.className = 'btn btn-outline';
+                btn.style.cssText = 'padding:4px 10px; font-size:12px; color:#2D7A3A;';
+                // Reload list to update buttons
+                setTimeout(function() { loadDonations(dlCurrentPage); }, 1500);
+            } else {
+                btn.disabled = false;
+                btn.textContent = origText;
+                alert(res.body.error || 'Erreur lors de l\u2019envoi.');
+            }
+        })
+        .catch(function() {
+            btn.disabled = false;
+            btn.textContent = origText;
+            alert('Erreur de connexion au serveur.');
+        });
+    }
+
     // ── Tab 2: Donations list ──
 
     var dlYear = document.getElementById('dl-year');
@@ -1142,19 +1175,33 @@ $current_user = wp_get_current_user();
 
                 // Actions column
                 var tdAction = document.createElement('td');
+                tdAction.style.cssText = 'white-space:nowrap;';
                 if (d.receipt_number) {
                     var btnView = document.createElement('a');
                     btnView.className = 'btn btn-outline';
-                    btnView.style.cssText = 'padding:4px 12px; font-size:12px; text-decoration:none;';
+                    btnView.style.cssText = 'padding:4px 10px; font-size:12px; text-decoration:none;';
                     btnView.textContent = 'Voir le re\u00e7u';
                     btnView.href = 'api-receipt.php?action=download&donation_id=' + d.id;
                     btnView.target = '_blank';
                     tdAction.appendChild(btnView);
                 } else {
+                    // Send receipt button (only if email)
+                    if (d.email) {
+                        var btnSend = document.createElement('button');
+                        btnSend.className = 'btn btn-primary';
+                        btnSend.style.cssText = 'padding:4px 10px; font-size:12px; margin-right:4px;';
+                        btnSend.textContent = 'Envoyer le re\u00e7u';
+                        btnSend.addEventListener('click', (function(donation) {
+                            return function(e) { sendReceiptFromList(donation, e.target); };
+                        })(d));
+                        tdAction.appendChild(btnSend);
+                    }
+                    // Edit icon button
                     var btnEdit = document.createElement('button');
                     btnEdit.className = 'btn btn-yellow';
-                    btnEdit.style.cssText = 'padding:4px 12px; font-size:12px;';
-                    btnEdit.textContent = 'Modifier';
+                    btnEdit.style.cssText = 'padding:4px 8px; font-size:14px; line-height:1;';
+                    btnEdit.title = 'Modifier';
+                    btnEdit.innerHTML = '&#9998;';
                     btnEdit.addEventListener('click', (function(donation) {
                         return function() { editFromList(donation); };
                     })(d));
