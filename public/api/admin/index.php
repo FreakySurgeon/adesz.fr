@@ -1234,13 +1234,9 @@ $current_user = wp_get_current_user();
         loadDonations(dlCurrentPage + 1);
     });
 
-    // Auto-load when switching to donations tab
-    var donationsTabLoaded = false;
+    // Reload donations list every time the tab is clicked
     document.querySelector('[data-tab="tab-donations-list"]').addEventListener('click', function() {
-        if (!donationsTabLoaded) {
-            donationsTabLoaded = true;
-            loadDonations(1);
-        }
+        loadDonations(1);
     });
 
 })();
