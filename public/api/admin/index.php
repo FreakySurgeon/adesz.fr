@@ -290,6 +290,7 @@ $current_user = wp_get_current_user();
         <button class="tab-btn active" data-tab="tab-donation">Saisir un don</button>
         <button class="tab-btn" data-tab="tab-donations-list">Voir les dons</button>
         <button class="tab-btn" data-tab="tab-receipts">Re&ccedil;us annuels</button>
+        <button class="tab-btn" data-tab="tab-export">Export</button>
     </div>
 
     <!-- Tab 1: Saisir un don -->
@@ -488,6 +489,33 @@ $current_user = wp_get_current_user();
                 <div class="msg msg-success" id="send-success"></div>
                 <div class="msg msg-error" id="send-error"></div>
                 <div class="msg msg-info" id="send-loading" style="display:none;">Envoi en cours, veuillez patienter&hellip;</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 4: Export -->
+    <div id="tab-export" class="tab-content">
+        <div class="card">
+            <h2>Export de la base de donn&eacute;es</h2>
+
+            <div style="display:flex; flex-direction:column; gap:20px;">
+                <div style="padding:16px; border:1px solid #e0e0e0; border-radius:8px;">
+                    <h3 style="font-size:15px; color:#1B5E27; margin-bottom:12px;">Dons</h3>
+                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                        <label for="export-year" style="font-weight:500;">Ann&eacute;e :</label>
+                        <select id="export-year" style="padding:6px 10px; border:1px solid #ccc; border-radius:6px;">
+                            <option value="">Toutes</option>
+                        </select>
+                        <a id="btn-export-donations" class="btn btn-primary" style="text-decoration:none;" href="#">T&eacute;l&eacute;charger (.xlsx)</a>
+                    </div>
+                </div>
+
+                <div style="padding:16px; border:1px solid #e0e0e0; border-radius:8px;">
+                    <h3 style="font-size:15px; color:#1B5E27; margin-bottom:12px;">Contacts</h3>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <a class="btn btn-primary" style="text-decoration:none;" href="api-export.php?table=contacts">T&eacute;l&eacute;charger (.xlsx)</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1246,6 +1274,28 @@ $current_user = wp_get_current_user();
     document.querySelector('[data-tab="tab-donations-list"]').addEventListener('click', function() {
         loadDonations(1);
     });
+
+    // ── Tab 4: Export ──
+
+    var exportYear = document.getElementById('export-year');
+    var btnExportDonations = document.getElementById('btn-export-donations');
+
+    // Populate year select
+    for (var y3 = currentYear; y3 >= 2022; y3--) {
+        var opt3 = document.createElement('option');
+        opt3.value = y3;
+        opt3.textContent = y3;
+        exportYear.appendChild(opt3);
+    }
+
+    function updateExportLink() {
+        var url = 'api-export.php?table=donations';
+        if (exportYear.value) url += '&year=' + encodeURIComponent(exportYear.value);
+        btnExportDonations.href = url;
+    }
+
+    exportYear.addEventListener('change', updateExportLink);
+    updateExportLink();
 
 })();
 </script>
