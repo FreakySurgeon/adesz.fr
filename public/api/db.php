@@ -110,3 +110,45 @@ function set_annual_receipt_number(array $donation_ids, string $receipt_number):
     $stmt = get_db()->prepare($sql);
     $stmt->execute(array_merge([$receipt_number], $donation_ids));
 }
+
+function get_next_counter(string $year_key): int {
+    $db = get_db();
+    $db->beginTransaction();
+    try {
+        $stmt = $db->prepare("INSERT INTO receipt_counters (year_key, counter) VALUES (?, 1)
+                              ON DUPLICATE KEY UPDATE counter = counter + 1");
+        $stmt->execute([$year_key]);
+        $stmt = $db->prepare("SELECT counter FROM receipt_counters WHERE year_key = ?");
+        $stmt->execute([$year_key]);
+        $counter = (int) $stmt->fetchColumn();
+        $db->commit();
+        return $counter;
+    } catch (Throwable $e) {
+        $db->rollBack();
+        throw $e;
+    }
+}
+
+function get_donation_by_id(int $id): ?array {
+    $stmt = get_db()->prepare("SELECT * FROM donations WHERE id = ?");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
+
+function update_donation(int $id, array $data): void {
+    $allowed = ['email', 'prenom', 'nom', 'adresse', 'cp', 'commune',
+                'amount', 'date_don', 'type', 'mode_paiement', 'receipt_number', 'annual_receipt_number'];
+    $sets = [];
+    $values = [];
+    foreach ($data as $col => $val) {
+        if (in_array($col, $allowed, true)) {
+            $sets[] = "$col = ?";
+            $values[] = $val;
+        }
+    }
+    if (empty($sets)) return;
+    $values[] = $id;
+    $sql = 'UPDATE donations SET ' . implode(', ', $sets) . ' WHERE id = ?';
+    get_db()->prepare($sql)->execute($values);
+}

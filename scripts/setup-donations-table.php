@@ -26,6 +26,36 @@ try {
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
     ");
     echo "OK: donations table created (or already exists).\n";
+
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS receipt_counters (
+            year_key VARCHAR(20) PRIMARY KEY,
+            counter INT NOT NULL DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    echo "OK: receipt_counters table created (or already exists).\n";
+
+    // Add UNIQUE indexes if they don't exist
+    try {
+        $db->exec("ALTER TABLE donations ADD UNIQUE INDEX uq_receipt_number (receipt_number)");
+        echo "OK: UNIQUE index on receipt_number added.\n";
+    } catch (Exception $e) {
+        if (strpos($e->getMessage(), 'Duplicate key name') !== false) {
+            echo "OK: UNIQUE index on receipt_number already exists.\n";
+        } else {
+            throw $e;
+        }
+    }
+    try {
+        $db->exec("ALTER TABLE donations ADD UNIQUE INDEX uq_annual_receipt_number (annual_receipt_number)");
+        echo "OK: UNIQUE index on annual_receipt_number added.\n";
+    } catch (Exception $e) {
+        if (strpos($e->getMessage(), 'Duplicate key name') !== false) {
+            echo "OK: UNIQUE index on annual_receipt_number already exists.\n";
+        } else {
+            throw $e;
+        }
+    }
 } catch (Exception $e) {
     echo "ERROR: " . $e->getMessage() . "\n";
     exit(1);

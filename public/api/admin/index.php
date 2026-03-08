@@ -288,6 +288,7 @@ $current_user = wp_get_current_user();
 <div class="container">
     <div class="tabs">
         <button class="tab-btn active" data-tab="tab-donation">Saisir un don</button>
+        <button class="tab-btn" data-tab="tab-donations-list">Voir les dons</button>
         <button class="tab-btn" data-tab="tab-receipts">Re&ccedil;us annuels</button>
     </div>
 
@@ -364,10 +365,88 @@ $current_user = wp_get_current_user();
                 <div class="msg msg-success" id="msg-success"></div>
                 <div class="msg msg-error" id="msg-error"></div>
             </form>
+
+            <!-- Confirmation panel (hidden by default) -->
+            <div id="confirm-panel" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <h2 style="color:#1B5E27; font-size:17px; margin:0;">Don enregistr&eacute;</h2>
+                    <button class="btn btn-outline" id="btn-new-donation" style="padding:6px 16px;">Nouveau don</button>
+                </div>
+
+                <div id="confirm-summary" style="background:#e8f5e9; padding:14px 18px; border-radius:5px; margin-bottom:16px; font-size:14px;"></div>
+
+                <!-- Receipt HTML preview -->
+                <div id="receipt-preview" style="border:1px solid #ddd; border-radius:5px; overflow:hidden; margin-bottom:16px;"></div>
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn btn-primary" id="btn-send-receipt" style="display:none;">Envoyer le re&ccedil;u par email</button>
+                    <button class="btn btn-outline" id="btn-download-receipt">T&eacute;l&eacute;charger PDF</button>
+                    <button class="btn btn-yellow" id="btn-edit-donation">Modifier</button>
+                </div>
+
+                <div class="msg msg-success" id="receipt-success"></div>
+                <div class="msg msg-error" id="receipt-error"></div>
+                <div class="msg msg-info" id="receipt-loading" style="display:none;">Envoi en cours&hellip;</div>
+            </div>
         </div>
     </div>
 
-    <!-- Tab 2: Recus annuels -->
+    <!-- Tab 2: Voir les dons -->
+    <div id="tab-donations-list" class="tab-content">
+        <div class="card">
+            <h2>Liste des dons</h2>
+
+            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
+                <div>
+                    <label for="dl-year" style="font-size:13px; font-weight:500; color:#555;">Ann&eacute;e :</label>
+                    <select id="dl-year" style="padding:6px 10px; border:1px solid #ccc; border-radius:5px; font-size:14px; font-family:inherit;"></select>
+                </div>
+                <div>
+                    <label for="dl-type" style="font-size:13px; font-weight:500; color:#555;">Type :</label>
+                    <select id="dl-type" style="padding:6px 10px; border:1px solid #ccc; border-radius:5px; font-size:14px; font-family:inherit;">
+                        <option value="">Tous</option>
+                        <option value="don">Don</option>
+                        <option value="adhesion">Adh&eacute;sion</option>
+                        <option value="combo">Combo</option>
+                    </select>
+                </div>
+                <div style="flex:1; min-width:180px;">
+                    <input type="text" id="dl-search" placeholder="Rechercher (nom, email)&hellip;" style="width:100%; padding:6px 10px; border:1px solid #ccc; border-radius:5px; font-size:14px; font-family:inherit;">
+                </div>
+                <button class="btn btn-primary" id="btn-dl-search" style="padding:7px 18px;">Filtrer</button>
+            </div>
+
+            <div class="stats-bar" id="dl-stats" style="display:none;"></div>
+            <div class="msg msg-info" id="dl-loading" style="display:none;">Chargement&hellip;</div>
+            <div class="msg msg-error" id="dl-error"></div>
+
+            <div style="overflow-x:auto;">
+                <table class="donors-table" id="dl-table" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Nom</th>
+                            <th>Pr&eacute;nom</th>
+                            <th>Email</th>
+                            <th>Montant</th>
+                            <th>Type</th>
+                            <th>Mode</th>
+                            <th>Source</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dl-tbody"></tbody>
+                </table>
+            </div>
+
+            <div id="dl-pagination" style="display:none; margin-top:16px; gap:8px; align-items:center; justify-content:center;">
+                <button class="btn btn-outline" id="dl-prev" style="padding:6px 14px;">&larr; Pr&eacute;c&eacute;dent</button>
+                <span id="dl-page-info" style="font-size:14px; color:#555;"></span>
+                <button class="btn btn-outline" id="dl-next" style="padding:6px 14px;">Suivant &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Recus annuels -->
     <div id="tab-receipts" class="tab-content">
         <div class="card">
             <h2>G&eacute;n&eacute;ration des re&ccedil;us fiscaux annuels</h2>
@@ -566,11 +645,108 @@ $current_user = wp_get_current_user();
         }
     });
 
-    // Form submit
+    // Form submit + confirmation panel
     var form = document.getElementById('donation-form');
     var msgSuccess = document.getElementById('msg-success');
     var msgError = document.getElementById('msg-error');
     var btnSave = document.getElementById('btn-save');
+    var confirmPanel = document.getElementById('confirm-panel');
+    var confirmSummary = document.getElementById('confirm-summary');
+    var receiptPreview = document.getElementById('receipt-preview');
+    var btnSendReceipt = document.getElementById('btn-send-receipt');
+    var btnDownloadReceipt = document.getElementById('btn-download-receipt');
+    var btnEditDonation = document.getElementById('btn-edit-donation');
+    var btnNewDonation = document.getElementById('btn-new-donation');
+    var receiptSuccess = document.getElementById('receipt-success');
+    var receiptError = document.getElementById('receipt-error');
+    var receiptLoading = document.getElementById('receipt-loading');
+    var editDonationId = 0; // 0 = insert mode, >0 = update mode
+    var currentDonation = null;
+
+    function showForm() {
+        form.style.display = '';
+        document.querySelector('.search-wrapper').style.display = '';
+        confirmPanel.style.display = 'none';
+    }
+
+    function showConfirmation(donation) {
+        currentDonation = donation;
+        form.style.display = 'none';
+        document.querySelector('.search-wrapper').style.display = 'none';
+        confirmPanel.style.display = 'block';
+        hideMsg(receiptSuccess);
+        hideMsg(receiptError);
+        receiptLoading.style.display = 'none';
+
+        // Summary
+        var amount = parseFloat(donation.amount).toFixed(2).replace('.', ',');
+        var typeLabel = donation.type === 'adhesion' ? 'Adh\u00e9sion' : (donation.type === 'combo' ? 'Combo' : 'Don');
+        var dateFmt = donation.date_don || '';
+        if (dateFmt && dateFmt.indexOf('-') > 0) {
+            var p = dateFmt.split('-');
+            dateFmt = p[2] + '/' + p[1] + '/' + p[0];
+        }
+        confirmSummary.innerHTML = '';
+        var summaryEl = document.createElement('div');
+        summaryEl.innerHTML = '<strong>' + esc(donation.prenom) + ' ' + esc(donation.nom) + '</strong>'
+            + (donation.email ? ' &mdash; ' + esc(donation.email) : '')
+            + '<br>' + esc(typeLabel) + ' de <strong>' + esc(amount) + ' &euro;</strong>'
+            + ' le ' + esc(dateFmt)
+            + ' (' + esc(donation.mode_paiement) + ')';
+        confirmSummary.appendChild(summaryEl);
+
+        // Receipt preview HTML
+        renderReceiptPreview(donation);
+
+        // Show/hide email button
+        btnSendReceipt.style.display = donation.email ? 'inline-block' : 'none';
+
+        // Show/hide edit button (only if no receipt generated yet)
+        btnEditDonation.style.display = donation.receipt_number ? 'none' : 'inline-block';
+    }
+
+    function renderReceiptPreview(d) {
+        var amount = parseFloat(d.amount);
+        var amountFmt = amount.toFixed(2).replace('.', ',');
+        var deduction66 = (amount * 0.66).toFixed(2).replace('.', ',');
+        var typeUpper = d.type === 'adhesion' ? 'COTISATION' : 'DON';
+        var dateFmt = d.date_don || '';
+        if (dateFmt && dateFmt.indexOf('-') > 0) {
+            var p = dateFmt.split('-');
+            dateFmt = p[2] + '/' + p[1] + '/' + p[0];
+        }
+        var donorName = ((d.prenom || '') + ' ' + (d.nom || '')).trim();
+        var donorAddr = d.adresse || '';
+        var donorCity = ((d.cp || '') + ' ' + (d.commune || '')).trim();
+
+        receiptPreview.innerHTML = ''
+            + '<div style="background:#2D7A3A;padding:10px 16px 8px;text-align:center;">'
+            + '<div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:0.5px;">ADESZ</div>'
+            + '<div style="color:#F5C518;font-size:10px;margin-top:2px;">Association pour le D\u00e9veloppement, l\'Entraide et la Solidarit\u00e9</div>'
+            + '</div>'
+            + '<div style="background:#fff;padding:16px 20px;">'
+            + '<div style="text-align:center;font-weight:600;font-size:14px;color:#1B5E27;margin-bottom:12px;">RE\u00c7U FISCAL \u2014 ' + esc(typeUpper) + '</div>'
+            + '<div style="display:flex;gap:16px;margin-bottom:12px;">'
+            + '<div style="flex:1;background:#F8F7F4;border:1px solid #e0e0e0;border-radius:4px;padding:10px;">'
+            + '<div style="font-size:10px;color:#2D7A3A;font-weight:600;margin-bottom:4px;">ORGANISME</div>'
+            + '<div style="font-size:11px;"><strong>ADESZ</strong> &mdash; Loi 1901<br>491 Bd Pierre Delmas, 06600 Antibes</div>'
+            + '</div>'
+            + '<div style="flex:1;background:#F8F7F4;border:1px solid #e0e0e0;border-radius:4px;padding:10px;">'
+            + '<div style="font-size:10px;color:#2D7A3A;font-weight:600;margin-bottom:4px;">DONATEUR</div>'
+            + '<div style="font-size:11px;"><strong>' + esc(donorName || 'Non renseign\u00e9') + '</strong>'
+            + (donorAddr ? '<br>' + esc(donorAddr) : '')
+            + (donorCity ? '<br>' + esc(donorCity) : '')
+            + '</div></div></div>'
+            + '<div style="background:#2D7A3A;color:#fff;border-radius:4px;padding:12px 16px;text-align:center;margin-bottom:12px;">'
+            + '<div style="font-size:11px;opacity:0.9;">Montant du ' + esc(d.type === 'adhesion' ? 'cotisation' : 'don') + '</div>'
+            + '<div style="font-size:22px;font-weight:700;">' + esc(amountFmt) + ' EUR</div>'
+            + '</div>'
+            + '<div style="font-size:11px;color:#555;margin-bottom:8px;">Date : ' + esc(dateFmt) + ' &mdash; Mode : ' + esc(d.mode_paiement || '') + '</div>'
+            + '<div style="background:#FFFBEB;border-left:3px solid #F5C518;padding:8px 12px;border-radius:3px;font-size:11px;">'
+            + '<strong>Avantage fiscal</strong> : r\u00e9duction de 66% = <strong>' + esc(deduction66) + ' EUR</strong> (art. 200 CGI)'
+            + '</div>'
+            + '</div>';
+    }
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -586,6 +762,11 @@ $current_user = wp_get_current_user();
         });
         data.amount = parseFloat(data.amount) || 0;
 
+        // Include id if in edit mode
+        if (editDonationId > 0) {
+            data.id = editDonationId;
+        }
+
         fetch('api-save.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -595,9 +776,8 @@ $current_user = wp_get_current_user();
         .then(function(res) {
             setLoading(btnSave, false);
             if (res.ok && res.body.success) {
-                showMsg(msgSuccess, 'Don enregistr\u00e9 avec succ\u00e8s.');
-                form.reset();
-                dateField.value = new Date().toISOString().slice(0, 10);
+                editDonationId = 0;
+                showConfirmation(res.body.donation);
             } else {
                 showMsg(msgError, res.body.error || 'Erreur inconnue.');
             }
@@ -606,6 +786,73 @@ $current_user = wp_get_current_user();
             setLoading(btnSave, false);
             showMsg(msgError, 'Erreur de connexion au serveur.');
         });
+    });
+
+    // "Nouveau don" button
+    btnNewDonation.addEventListener('click', function() {
+        editDonationId = 0;
+        currentDonation = null;
+        form.reset();
+        dateField.value = new Date().toISOString().slice(0, 10);
+        showForm();
+    });
+
+    // "Modifier" button
+    btnEditDonation.addEventListener('click', function() {
+        if (!currentDonation) return;
+        editDonationId = parseInt(currentDonation.id, 10);
+        // Pre-fill form
+        document.getElementById('f-prenom').value = currentDonation.prenom || '';
+        document.getElementById('f-nom').value = currentDonation.nom || '';
+        document.getElementById('f-email').value = currentDonation.email || '';
+        document.getElementById('f-telephone').value = currentDonation.telephone || '';
+        document.getElementById('f-adresse').value = currentDonation.adresse || '';
+        document.getElementById('f-code_postal').value = currentDonation.cp || '';
+        document.getElementById('f-commune').value = currentDonation.commune || '';
+        document.getElementById('f-amount').value = currentDonation.amount || '';
+        document.getElementById('f-date').value = currentDonation.date_don || '';
+        document.getElementById('f-type').value = currentDonation.type || 'don';
+        document.getElementById('f-mode').value = currentDonation.mode_paiement || 'cheque';
+        showForm();
+    });
+
+    // "Envoyer reçu par email" button
+    btnSendReceipt.addEventListener('click', function() {
+        if (!currentDonation || !currentDonation.email) return;
+        if (!confirm('Envoyer le re\u00e7u fiscal \u00e0 ' + currentDonation.email + ' ?')) return;
+        hideMsg(receiptSuccess);
+        hideMsg(receiptError);
+        receiptLoading.style.display = 'block';
+        setLoading(btnSendReceipt, true);
+
+        fetch('api-receipt.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ donation_id: parseInt(currentDonation.id, 10), action: 'send' })
+        })
+        .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, body: j }; }); })
+        .then(function(res) {
+            receiptLoading.style.display = 'none';
+            setLoading(btnSendReceipt, false);
+            if (res.ok && res.body.success) {
+                showMsg(receiptSuccess, 'Re\u00e7u ' + (res.body.receipt_number || '') + ' envoy\u00e9 \u00e0 ' + (res.body.email || currentDonation.email));
+                currentDonation.receipt_number = res.body.receipt_number;
+                btnEditDonation.style.display = 'none';
+            } else {
+                showMsg(receiptError, res.body.error || 'Erreur lors de l\'envoi.');
+            }
+        })
+        .catch(function() {
+            receiptLoading.style.display = 'none';
+            setLoading(btnSendReceipt, false);
+            showMsg(receiptError, 'Erreur de connexion au serveur.');
+        });
+    });
+
+    // "Télécharger PDF" button
+    btnDownloadReceipt.addEventListener('click', function() {
+        if (!currentDonation) return;
+        window.open('api-receipt.php?action=download&donation_id=' + currentDonation.id, '_blank');
     });
 
     // ── Tab 2: Annual receipts ──
@@ -770,6 +1017,139 @@ $current_user = wp_get_current_user();
             showMsg(sendError, 'Erreur de connexion au serveur.');
         });
     }
+
+    // ── Tab 2: Donations list ──
+
+    var dlYear = document.getElementById('dl-year');
+    var dlType = document.getElementById('dl-type');
+    var dlSearch = document.getElementById('dl-search');
+    var btnDlSearch = document.getElementById('btn-dl-search');
+    var dlStats = document.getElementById('dl-stats');
+    var dlLoading = document.getElementById('dl-loading');
+    var dlError = document.getElementById('dl-error');
+    var dlTable = document.getElementById('dl-table');
+    var dlTbody = document.getElementById('dl-tbody');
+    var dlPagination = document.getElementById('dl-pagination');
+    var dlPageInfo = document.getElementById('dl-page-info');
+    var dlPrev = document.getElementById('dl-prev');
+    var dlNext = document.getElementById('dl-next');
+    var dlCurrentPage = 1;
+
+    // Populate year select
+    for (var y2 = currentYear; y2 >= 2022; y2--) {
+        var opt2 = document.createElement('option');
+        opt2.value = y2;
+        opt2.textContent = y2;
+        if (y2 === currentYear) opt2.selected = true;
+        dlYear.appendChild(opt2);
+    }
+
+    function loadDonations(page) {
+        dlCurrentPage = page || 1;
+        hideMsg(dlError);
+        dlLoading.style.display = 'block';
+        dlTable.style.display = 'none';
+        dlPagination.style.display = 'none';
+        dlStats.style.display = 'none';
+
+        var params = 'year=' + encodeURIComponent(dlYear.value)
+            + '&page=' + dlCurrentPage;
+        if (dlType.value) params += '&type=' + encodeURIComponent(dlType.value);
+        if (dlSearch.value.trim()) params += '&q=' + encodeURIComponent(dlSearch.value.trim());
+
+        fetch('api-donations.php?' + params)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                dlLoading.style.display = 'none';
+                if (data.error) {
+                    showMsg(dlError, data.error);
+                    return;
+                }
+                renderDonationsList(data);
+            })
+            .catch(function() {
+                dlLoading.style.display = 'none';
+                showMsg(dlError, 'Erreur de connexion au serveur.');
+            });
+    }
+
+    function renderDonationsList(data) {
+        var donations = data.donations || [];
+
+        // Stats
+        dlStats.textContent = data.stats.nb + ' don' + (data.stats.nb > 1 ? 's' : '')
+            + ' \u00b7 ' + data.stats.total.toFixed(2).replace('.', ',') + ' \u20ac total'
+            + ' \u00b7 Page ' + data.page + '/' + data.pages
+            + ' (' + data.total + ' r\u00e9sultat' + (data.total > 1 ? 's' : '') + ')';
+        dlStats.style.display = 'flex';
+
+        // Table
+        dlTbody.innerHTML = '';
+        if (donations.length === 0) {
+            var tr = document.createElement('tr');
+            var td = document.createElement('td');
+            td.colSpan = 8;
+            td.textContent = 'Aucun don trouv\u00e9.';
+            td.style.textAlign = 'center';
+            td.style.padding = '20px';
+            td.style.color = '#888';
+            tr.appendChild(td);
+            dlTbody.appendChild(tr);
+        } else {
+            donations.forEach(function(d) {
+                var tr = document.createElement('tr');
+
+                var fields = [
+                    { val: d.date_don || '' },
+                    { val: d.nom || '' },
+                    { val: d.prenom || '' },
+                    { val: d.email || '\u2014', style: 'font-size:12px;color:#666;' },
+                    { val: parseFloat(d.amount).toFixed(2).replace('.', ',') + ' \u20ac', style: 'font-weight:500;' },
+                    { val: d.type || '' },
+                    { val: d.mode_paiement || '' },
+                    { val: d.source || '' },
+                ];
+
+                fields.forEach(function(f) {
+                    var td = document.createElement('td');
+                    td.textContent = f.val;
+                    if (f.style) td.style.cssText = f.style;
+                    tr.appendChild(td);
+                });
+
+                dlTbody.appendChild(tr);
+            });
+        }
+        dlTable.style.display = 'table';
+
+        // Pagination
+        dlPagination.style.display = (data.pages > 1) ? 'flex' : 'none';
+        dlPageInfo.textContent = 'Page ' + data.page + ' / ' + data.pages;
+        dlPrev.disabled = data.page <= 1;
+        dlNext.disabled = data.page >= data.pages;
+    }
+
+    btnDlSearch.addEventListener('click', function() { loadDonations(1); });
+    dlYear.addEventListener('change', function() { loadDonations(1); });
+    dlType.addEventListener('change', function() { loadDonations(1); });
+    dlSearch.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') loadDonations(1);
+    });
+    dlPrev.addEventListener('click', function() {
+        if (dlCurrentPage > 1) loadDonations(dlCurrentPage - 1);
+    });
+    dlNext.addEventListener('click', function() {
+        loadDonations(dlCurrentPage + 1);
+    });
+
+    // Auto-load when switching to donations tab
+    var donationsTabLoaded = false;
+    document.querySelector('[data-tab="tab-donations-list"]').addEventListener('click', function() {
+        if (!donationsTabLoaded) {
+            donationsTabLoaded = true;
+            loadDonations(1);
+        }
+    });
 
 })();
 </script>

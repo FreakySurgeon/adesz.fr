@@ -10,37 +10,18 @@ require_once __DIR__ . '/lib/tfpdf.php';
 
 /**
  * Get the next receipt number for the current year.
- * Uses a simple JSON counter file with file locking.
+ * Uses MySQL receipt_counters table (atomic increment).
  */
 function get_next_receipt_number(): string {
+    require_once __DIR__ . '/db.php';
     $year = date('Y');
-    $counter_file = __DIR__ . '/receipts/counter.json';
-
-    $dir = dirname($counter_file);
-    if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
-    }
-
-    $fp = fopen($counter_file, 'c+');
-    if (!$fp || !flock($fp, LOCK_EX)) {
-        error_log('Cannot lock receipt counter file');
+    try {
+        $counter = get_next_counter($year);
+        return sprintf('ADESZ-%s-%03d', $year, $counter);
+    } catch (Throwable $e) {
+        error_log('Receipt counter error: ' . $e->getMessage());
         return 'ADESZ-' . $year . '-ERR';
     }
-
-    $content = stream_get_contents($fp);
-    $data = $content ? (json_decode($content, true) ?: []) : [];
-
-    $current = ($data[$year] ?? 0) + 1;
-    $data[$year] = $current;
-
-    ftruncate($fp, 0);
-    rewind($fp);
-    fwrite($fp, json_encode($data, JSON_PRETTY_PRINT));
-    fflush($fp);
-    flock($fp, LOCK_UN);
-    fclose($fp);
-
-    return sprintf('ADESZ-%s-%03d', $year, $current);
 }
 
 /**
@@ -129,7 +110,7 @@ function nombre_en_lettres(float $amount): string {
  * @return array{path: string, filename: string, number: string, content: string}|false
  */
 function generate_receipt_pdf(array $data) {
-    $receipt_number = get_next_receipt_number();
+    $receipt_number = $data['receipt_number_override'] ?? get_next_receipt_number();
     $year = date('Y');
 
     $pdf = new tFPDF('P', 'mm', 'A4');

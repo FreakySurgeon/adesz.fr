@@ -12,38 +12,18 @@ require_once __DIR__ . '/generate-receipt.php';
 
 /**
  * Get the next annual receipt number for a given year.
- * Uses key "annual_{year}" in receipts/counter.json.
+ * Uses MySQL receipt_counters table (key "annual_{year}").
  * Returns format: ADESZ-ANN-{YEAR}-{NNN}
  */
 function get_next_annual_receipt_number(int $year): string {
-    $counter_file = __DIR__ . '/receipts/counter.json';
-
-    $dir = dirname($counter_file);
-    if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
-    }
-
-    $fp = fopen($counter_file, 'c+');
-    if (!$fp || !flock($fp, LOCK_EX)) {
-        error_log('Cannot lock receipt counter file');
+    require_once __DIR__ . '/db.php';
+    try {
+        $counter = get_next_counter('annual_' . $year);
+        return sprintf('ADESZ-ANN-%d-%03d', $year, $counter);
+    } catch (Throwable $e) {
+        error_log('Annual receipt counter error: ' . $e->getMessage());
         return 'ADESZ-ANN-' . $year . '-ERR';
     }
-
-    $content = stream_get_contents($fp);
-    $data = $content ? (json_decode($content, true) ?: []) : [];
-
-    $key = 'annual_' . $year;
-    $current = ($data[$key] ?? 0) + 1;
-    $data[$key] = $current;
-
-    ftruncate($fp, 0);
-    rewind($fp);
-    fwrite($fp, json_encode($data, JSON_PRETTY_PRINT));
-    fflush($fp);
-    flock($fp, LOCK_UN);
-    fclose($fp);
-
-    return sprintf('ADESZ-ANN-%d-%03d', $year, $current);
 }
 
 /**
