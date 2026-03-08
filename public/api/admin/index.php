@@ -282,10 +282,7 @@ $current_user = wp_get_current_user();
 
 <div class="header">
     <h1>ADESZ &mdash; Administration</h1>
-    <div style="display:flex; align-items:center; gap:12px;">
-        <button id="btn-sync-brevo" style="padding:5px 12px; font-size:12px; background:#F5C518; color:#2D3436; border:none; border-radius:4px; cursor:pointer; font-weight:500;">&#x21BB; Sync Brevo</button>
-        <span class="user-info"><?php echo esc_html($current_user->display_name); ?></span>
-    </div>
+    <span class="user-info"><?php echo esc_html($current_user->display_name); ?></span>
 </div>
 
 <div class="container">
@@ -500,32 +497,6 @@ $current_user = wp_get_current_user();
 (function() {
     'use strict';
 
-    // ── Sync Brevo button ──
-    document.getElementById('btn-sync-brevo').addEventListener('click', function() {
-        var btn = this;
-        if (!confirm('Importer/mettre \u00e0 jour les contacts depuis Brevo ?')) return;
-        var origText = btn.innerHTML;
-        btn.disabled = true;
-        btn.textContent = 'Sync\u2026';
-
-        fetch('api-sync-brevo.php', { method: 'POST' })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                btn.disabled = false;
-                if (data.success) {
-                    btn.textContent = data.imported + ' contacts \u2713';
-                    setTimeout(function() { btn.innerHTML = origText; }, 3000);
-                } else {
-                    btn.innerHTML = origText;
-                    alert(data.error || 'Erreur sync');
-                }
-            })
-            .catch(function() {
-                btn.disabled = false;
-                btn.innerHTML = origText;
-                alert('Erreur de connexion.');
-            });
-    });
 
     // ── Helpers ──
 

@@ -156,7 +156,7 @@ function wrap_email(string $inner, string $signed_by = 'L\'equipe ADESZ'): strin
 
         // Header
         . '<tr><td style="background-color:#2D7A3A;padding:24px;text-align:center;">'
-        . '<img src="https://adesz.fr/images/logo-adesz.webp" alt="ADESZ" width="120" style="display:block;margin:0 auto 12px auto;max-width:120px;" />'
+        . '<img src="https://adesz.fr/images/logo.png" alt="ADESZ" width="120" style="display:block;margin:0 auto 12px auto;max-width:120px;" />'
         . '<p style="margin:0;font-size:14px;color:#F5C518;font-weight:600;">Association pour le D&eacute;veloppement &Eacute;conomique et Social du pays Zaghawa</p>'
         . '</td></tr>'
 
