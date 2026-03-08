@@ -65,11 +65,17 @@ async function fetchAPI<T>(endpoint: string, params?: Record<string, string>): P
   if (params) {
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   }
-  const res = await fetch(url.toString());
-  if (!res.ok) {
-    throw new Error(`WP API error: ${res.status} ${res.statusText}`);
+  try {
+    const res = await fetch(url.toString());
+    if (!res.ok) {
+      console.error(`WP API error: ${res.status} ${res.statusText} for ${endpoint}`);
+      return [] as unknown as T;
+    }
+    return res.json();
+  } catch (e) {
+    console.error(`WP API fetch failed for ${endpoint}:`, e);
+    return [] as unknown as T;
   }
-  return res.json();
 }
 
 export async function getPosts(params?: Record<string, string>): Promise<WPPost[]> {
@@ -86,7 +92,11 @@ export async function getPostBySlug(slug: string): Promise<WPPost | undefined> {
 }
 
 export async function getPage(id: number): Promise<WPPage> {
-  return fetchAPI<WPPage>(`pages/${id}`);
+  const result = await fetchAPI<WPPage>(`pages/${id}`);
+  if (!result || Array.isArray(result)) {
+    return { id, title: { rendered: '' }, content: { rendered: '' }, excerpt: { rendered: '' } } as WPPage;
+  }
+  return result;
 }
 
 export async function getMedia(id: number): Promise<WPMedia> {
