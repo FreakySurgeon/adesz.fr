@@ -10,7 +10,7 @@ interface Props {
   ogImage?: string;
 }
 
-const defaultDescription = "ADESZ - Association pour le D\u00e9veloppement \u00c9conomique et Social de Zafaya. \u00c9ducation, sant\u00e9 et agriculture au Tchad.";
+const defaultDescription = "ADESZ - Association pour le Développement, l'Entraide et la Solidarité du Village de Zafaya. Éducation, sant\u00e9 et agriculture au Tchad.";
 const { title, description = defaultDescription, ogImage = "/images/logo-adesz-2026.jpg" } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -21,7 +21,7 @@ const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "NGO",
   "name": "ADESZ",
-  "alternateName": "Association pour le D\u00e9veloppement \u00c9conomique et Social de Zafaya",
+  "alternateName": "Association pour le Développement, l'Entraide et la Solidarité du Village de Zafaya",
   "url": "https://adesz.fr",
   "logo": "https://adesz.fr/images/logo-adesz-2026.jpg",
   "description": "Association loi 1901 pour le d\u00e9veloppement du village de Zafaya au Tchad",
