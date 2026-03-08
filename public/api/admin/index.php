@@ -1007,7 +1007,14 @@ $current_user = wp_get_current_user();
             sendLoading.style.display = 'none';
             setLoading(btn, false);
             if (res.ok && res.body.success) {
-                showMsg(sendSuccess, res.body.message || 'Envoi termin\u00e9.');
+                var msg = res.body.sent + ' re\u00e7u' + (res.body.sent > 1 ? 's' : '') + ' envoy\u00e9' + (res.body.sent > 1 ? 's' : '') + '.';
+                if (res.body.errors && res.body.errors.length > 0) {
+                    msg += ' ' + res.body.errors.length + ' erreur(s).';
+                }
+                if (res.body.sans_email && res.body.sans_email.length > 0) {
+                    msg += ' ' + res.body.sans_email.length + ' sans email.';
+                }
+                showMsg(sendSuccess, msg);
             } else {
                 showMsg(sendError, res.body.error || 'Erreur lors de l\u2019envoi.');
             }

@@ -199,6 +199,7 @@ function handle_send(int $year, bool $test_mode): void {
     }
 
     echo json_encode([
+        'success'    => true,
         'sent'       => $sent,
         'errors'     => $errors,
         'sans_email' => $sans_email,
