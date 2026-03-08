@@ -1,1 +1,9 @@
 ErrorDocument 404 /404.html
+
+# Route WordPress REST API to WP index.php
+# wp-json is a virtual route handled by WordPress, needs rewrite
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^wp-json(/.*)?$ /index.php [L]
+</IfModule>
