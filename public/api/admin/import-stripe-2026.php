@@ -21,7 +21,7 @@ $output = [];
 $output[] = "=== Import Stripe 2026 + Clean test data ===\n";
 
 // Step 1: Clean test donations
-$pdo = get_pdo();
+$pdo = get_db();
 $stmt = $pdo->query("SELECT id, prenom, nom, amount, date_don, receipt_number FROM donations WHERE nom = 'Dupont Testeur'");
 $test_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
