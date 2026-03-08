@@ -1142,7 +1142,15 @@ $current_user = wp_get_current_user();
 
                 // Actions column
                 var tdAction = document.createElement('td');
-                if (!d.receipt_number) {
+                if (d.receipt_number) {
+                    var btnView = document.createElement('a');
+                    btnView.className = 'btn btn-outline';
+                    btnView.style.cssText = 'padding:4px 12px; font-size:12px; text-decoration:none;';
+                    btnView.textContent = 'Voir le re\u00e7u';
+                    btnView.href = 'api-receipt.php?action=download&donation_id=' + d.id;
+                    btnView.target = '_blank';
+                    tdAction.appendChild(btnView);
+                } else {
                     var btnEdit = document.createElement('button');
                     btnEdit.className = 'btn btn-yellow';
                     btnEdit.style.cssText = 'padding:4px 12px; font-size:12px;';
