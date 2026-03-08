@@ -31,13 +31,13 @@ if ($table === 'donations') {
     $sheetName = 'Dons' . ($year ? " {$year}" : '');
     $filename = 'adesz-dons' . ($year ? "-{$year}" : '') . '-' . date('Y-m-d') . '.xlsx';
 } else {
-    $sql = "SELECT id, email, prenom, nom, adresse, cp, commune, telephone, type, source, created_at
+    $sql = "SELECT id, email, prenom, nom, adresse, cp, commune, telephone, type, source, updated_at
             FROM contacts
             ORDER BY nom, prenom";
     $params = [];
 
     $headers = ['ID', 'Email', 'Prénom', 'Nom', 'Adresse', 'Code postal', 'Commune',
-                'Téléphone', 'Type', 'Source', 'Créé le'];
+                'Téléphone', 'Type', 'Source', 'Mis à jour le'];
 
     $sheetName = 'Contacts';
     $filename = 'adesz-contacts-' . date('Y-m-d') . '.xlsx';

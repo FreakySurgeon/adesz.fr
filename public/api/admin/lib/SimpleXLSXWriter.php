@@ -54,7 +54,7 @@ class SimpleXLSXWriter {
         $index = [];
         foreach ($this->rows as $row) {
             foreach ($row as $cell) {
-                $val = (string) $cell;
+                $val = (string) ($cell ?? '');
                 if (!isset($index[$val])) {
                     $index[$val] = count($strings);
                     $strings[] = $val;
@@ -87,10 +87,10 @@ class SimpleXLSXWriter {
             $xml .= '<row r="' . $rowNum . '">';
             foreach ($row as $c => $cell) {
                 $ref = $this->colLetter($c) . $rowNum;
-                $val = (string) $cell;
+                $val = (string) ($cell ?? '');
 
                 // Numeric values (including decimals)
-                if (is_numeric($cell) && $val !== '' && !str_starts_with($val, '0')) {
+                if ($val !== '' && is_numeric($val) && !str_starts_with($val, '0')) {
                     $xml .= '<c r="' . $ref . '"><v>' . $val . '</v></c>';
                 } else {
                     // String — use shared string index
