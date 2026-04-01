@@ -46,14 +46,23 @@ function insert_donation(array $data): int {
 }
 
 function search_donors(string $query, int $limit = 10): array {
+    $like = '%' . $query . '%';
     $sql = "SELECT DISTINCT prenom, nom, email, adresse, cp, commune
             FROM donations
-            WHERE CONCAT(nom, ' ', prenom) LIKE ? COLLATE utf8mb4_unicode_ci
+            WHERE nom LIKE ? COLLATE utf8mb4_unicode_ci
+               OR prenom LIKE ? COLLATE utf8mb4_unicode_ci
+               OR email LIKE ? COLLATE utf8mb4_unicode_ci
+               OR CONCAT(nom, ' ', prenom) LIKE ? COLLATE utf8mb4_unicode_ci
+               OR CONCAT(prenom, ' ', nom) LIKE ? COLLATE utf8mb4_unicode_ci
             ORDER BY nom, prenom
             LIMIT ?";
     $stmt = get_db()->prepare($sql);
-    $stmt->bindValue(1, '%' . $query . '%');
-    $stmt->bindValue(2, $limit, PDO::PARAM_INT);
+    $stmt->bindValue(1, $like);
+    $stmt->bindValue(2, $like);
+    $stmt->bindValue(3, $like);
+    $stmt->bindValue(4, $like);
+    $stmt->bindValue(5, $like);
+    $stmt->bindValue(6, $limit, PDO::PARAM_INT);
     $stmt->execute();
 
     return $stmt->fetchAll();

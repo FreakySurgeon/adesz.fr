@@ -662,7 +662,7 @@ $current_user = wp_get_current_user();
         document.getElementById('f-email').value = d.email || '';
         document.getElementById('f-telephone').value = d.telephone || '';
         document.getElementById('f-adresse').value = d.adresse || '';
-        document.getElementById('f-code_postal').value = d.code_postal || '';
+        document.getElementById('f-code_postal').value = d.cp || '';
         document.getElementById('f-commune').value = d.commune || '';
         searchInput.value = '';
         closeAutocomplete();
