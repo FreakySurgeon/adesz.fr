@@ -14,7 +14,7 @@ if (!file_exists($wp_load)) {
 
 require_once $wp_load;
 
-if (!is_user_logged_in() || !current_user_can('manage_options')) {
+if (!is_user_logged_in() || !current_user_can('edit_others_posts')) {
     wp_redirect(wp_login_url($_SERVER['REQUEST_URI']));
     exit;
 }
